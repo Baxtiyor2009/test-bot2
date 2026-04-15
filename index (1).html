@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test Varag'i</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0f1117; --surface: #1a1d27; --surface2: #222538;
+      --accent: #6c63ff; --accent2: #ff6584; --accent3: #43e97b;
+      --text: #e8eaf6; --muted: #7b7fa3; --border: #2e3150; --radius: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* HOME & LOGIN */
+    #homeScreen, #adminLogin {
+      align-items: center; justify-content: center; padding: 24px;
+      background: radial-gradient(ellipse at 50% 0%, #1e1b4b 0%, var(--bg) 70%);
+    }
+    .lock-icon { font-size: 52px; margin-bottom: 14px; filter: drop-shadow(0 0 20px #6c63ff88); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+    .lock-title { font-size: 24px; font-weight: 900; margin-bottom: 6px; }
+    .lock-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; text-align: center; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; width: 100%; max-width: 340px; box-shadow: 0 8px 40px #0008; }
+    .card label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 9px; }
+    .input-row { display: flex; gap: 10px; }
+    .text-input { flex:1; background:var(--surface2); border:2px solid var(--border); border-radius:10px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; padding:11px 14px; letter-spacing:3px; outline:none; transition:border-color 0.2s; }
+    .text-input:focus { border-color: var(--accent); }
+    .text-input::placeholder { color:#3a3d5a; }
+    .icon-btn { background:linear-gradient(135deg,var(--accent),#8b5cf6); color:white; border:none; border-radius:10px; padding:11px 20px; font-size:20px; cursor:pointer; transition:opacity 0.2s,transform 0.1s; }
+    .icon-btn:active { transform:scale(0.95); opacity:0.85; }
+    .error-msg { margin-top:10px; font-size:13px; color:var(--accent2); font-weight:600; display:none; text-align:center; }
+    .home-btns { display:flex; flex-direction:column; gap:9px; margin-top:14px; }
+    .outline-btn { background:transparent; border:2px solid var(--border); border-radius:10px; color:var(--muted); font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; padding:10px; cursor:pointer; transition:all 0.2s; }
+    .outline-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* ADMIN */
+    #adminScreen { overflow-y:auto; }
+    .admin-header { background:linear-gradient(135deg,#1a1d27,#222538); border-bottom:1px solid var(--border); padding:13px 18px; position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; }
+    .admin-title { font-size:15px; font-weight:900; }
+    .back-btn { background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--muted); font-size:13px; font-weight:700; padding:6px 12px; cursor:pointer; }
+    .admin-section { padding:14px 14px 0; }
+    .admin-section h3 { font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+    .code-setup { display:flex; gap:10px; margin-bottom:10px; }
+    .code-field { flex:1; background:var(--surface2); border:2px solid var(--border); border-radius:10px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; padding:9px 13px; outline:none; transition:border-color 0.2s; letter-spacing:2px; }
+    .code-field:focus { border-color:var(--accent); }
+    .save-btn { background:linear-gradient(135deg,var(--accent),var(--accent3)); border:none; border-radius:10px; color:white; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; padding:9px 16px; cursor:pointer; }
+    .admin-grid { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+    .admin-row { display:grid; grid-template-columns:30px 1fr; align-items:center; gap:7px; }
+    .a-num { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:var(--muted); text-align:right; }
+    .opts-row { display:flex; gap:4px; }
+    .a-btn { flex:1; height:32px; border-radius:8px; border:2px solid var(--border); background:var(--surface2); color:var(--muted); font-family:'Nunito',sans-serif; font-size:12px; font-weight:800; cursor:pointer; transition:all 0.15s; }
+    .a-btn.sel-A{background:#4ade8022;border-color:#4ade80;color:#4ade80}
+    .a-btn.sel-B{background:#60a5fa22;border-color:#60a5fa;color:#60a5fa}
+    .a-btn.sel-C{background:#f472b622;border-color:#f472b6;color:#f472b6}
+    .a-btn.sel-D{background:#fb923c22;border-color:#fb923c;color:#fb923c}
+    .a-btn.sel-E{background:#a78bfa22;border-color:#a78bfa;color:#a78bfa}
+    .a-btn.sel-F{background:#fbbf2422;border-color:#fbbf24;color:#fbbf24}
+    .wk-row { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
+    .wk-label { font-size:11px; font-weight:800; color:var(--muted); margin-bottom:6px; }
+    .wk-parts { display:flex; gap:8px; }
+    .wk-part { flex:1; }
+    .wk-input { background:var(--surface2); border:2px solid var(--border); border-radius:8px; color:var(--text); font-family:'Nunito',sans-serif; font-size:13px; font-weight:600; padding:7px 9px; outline:none; transition:border-color 0.2s; resize:none; width:100%; }
+    .wk-input:focus { border-color:var(--accent); }
+    .divider { height:1px; background:var(--border); margin:4px 14px 14px; }
+
+    /* MAIN TEST */
+    #mainApp { overflow-y:auto; }
+    .app-header { background:linear-gradient(135deg,#1a1d27,#222538); border-bottom:1px solid var(--border); padding:13px 18px; position:sticky; top:0; z-index:100; }
+    .header-top { display:flex; align-items:center; justify-content:space-between; }
+    .app-title { font-size:16px; font-weight:900; }
+    .badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+    .badge-blue { background:#6c63ff22; color:var(--accent); border:1px solid #6c63ff44; }
+    .student-info { display:flex; gap:7px; margin-top:8px; flex-wrap:wrap; }
+    .info-chip { font-size:12px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:3px 9px; color:var(--muted); }
+    .info-chip span { color:var(--text); font-weight:700; }
+    .section-wrapper { padding:13px 13px 0; }
+    .section-header { display:flex; align-items:center; gap:9px; margin-bottom:9px; }
+    .section-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+    .section-label { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; }
+    .section-range { font-size:12px; color:var(--muted); margin-left:auto; }
+    .abcd-grid { display:flex; flex-direction:column; gap:4px; margin-bottom:13px; }
+    .abcd-row { display:grid; grid-template-columns:28px 1fr; align-items:center; gap:7px; }
+    .q-num { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:var(--muted); text-align:right; }
+    .options-row { display:flex; gap:4px; }
+    .opt-btn { flex:1; height:35px; border-radius:8px; border:2px solid var(--border); background:var(--surface2); color:var(--muted); font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer; transition:all 0.15s; }
+    .opt-btn:active { transform:scale(0.93); }
+    .opt-btn.selected-A{background:#4ade8022;border-color:#4ade80;color:#4ade80}
+    .opt-btn.selected-B{background:#60a5fa22;border-color:#60a5fa;color:#60a5fa}
+    .opt-btn.selected-C{background:#f472b622;border-color:#f472b6;color:#f472b6}
+    .opt-btn.selected-D{background:#fb923c22;border-color:#fb923c;color:#fb923c}
+    .opt-btn.selected-E{background:#a78bfa22;border-color:#a78bfa;color:#a78bfa}
+    .opt-btn.selected-F{background:#fbbf2422;border-color:#fbbf24;color:#fbbf24}
+    .opt-btn.correct{background:#4ade8033;border-color:#4ade80;color:#4ade80}
+    .opt-btn.wrong{background:#ff658433;border-color:#ff6584;color:#ff6584}
+    .opt-btn.missed{background:#fbbf2433;border-color:#fbbf24;color:#fbbf24}
+    .written-grid { display:flex; flex-direction:column; gap:9px; margin-bottom:13px; }
+    .written-row { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:11px 13px; }
+    .written-num { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:var(--accent); margin-bottom:8px; }
+    .written-parts { display:flex; gap:7px; }
+    .written-part { flex:1; display:flex; flex-direction:column; gap:3px; }
+    .part-label { font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; }
+    .written-input { background:var(--surface2); border:2px solid var(--border); border-radius:9px; color:var(--text); font-family:'Nunito',sans-serif; font-size:13px; font-weight:600; padding:7px 9px; outline:none; transition:border-color 0.2s; resize:none; width:100%; }
+    .written-input:focus { border-color:var(--accent); }
+    .written-input::placeholder { color:#3a3d5a; }
+    .written-input.correct-input { border-color:#4ade80; background:#4ade8011; }
+    .written-input.wrong-input { border-color:#ff6584; background:#ff658411; }
+    .answer-hint { font-size:11px; color:#fbbf24; font-weight:700; margin-top:3px; display:none; }
+    .submit-area { padding:13px; padding-bottom:28px; }
+    .progress-bar-wrap { background:var(--surface2); border-radius:10px; height:5px; margin-bottom:10px; overflow:hidden; }
+    .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent3)); border-radius:10px; transition:width 0.4s; }
+    .progress-label { font-size:12px; color:var(--muted); margin-bottom:10px; text-align:center; }
+    .submit-btn { width:100%; padding:14px; background:linear-gradient(135deg,var(--accent),var(--accent3)); border:none; border-radius:var(--radius); color:white; font-family:'Nunito',sans-serif; font-size:15px; font-weight:900; cursor:pointer; box-shadow:0 4px 24px #6c63ff44; transition:opacity 0.2s,transform 0.1s; }
+    .submit-btn:active { transform:scale(0.98); opacity:0.88; }
+
+    /* RESULT */
+    #resultScreen { align-items:center; justify-content:flex-start; overflow-y:auto; padding:24px 16px 40px; background:radial-gradient(ellipse at 50% 0%,#0d2a1a 0%,var(--bg) 60%); }
+    .result-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:22px; width:100%; max-width:360px; box-shadow:0 8px 40px #0008; margin-bottom:12px; }
+    .result-title { font-size:19px; font-weight:900; text-align:center; margin-bottom:18px; }
+    .score-big { font-family:'JetBrains Mono',monospace; font-size:50px; font-weight:700; text-align:center; color:var(--accent3); filter:drop-shadow(0 0 20px #43e97b88); margin-bottom:3px; }
+    .score-sub { text-align:center; font-size:13px; color:var(--muted); margin-bottom:18px; }
+    .stats-row { display:flex; gap:9px; margin-bottom:18px; }
+    .stat-box { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:11px; text-align:center; }
+    .stat-num { font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; }
+    .stat-lbl { font-size:11px; color:var(--muted); font-weight:700; margin-top:2px; }
+    .stat-correct .stat-num{color:#4ade80} .stat-wrong .stat-num{color:#ff6584} .stat-empty .stat-num{color:#fbbf24}
+    .detail-btn { width:100%; padding:11px; background:var(--surface2); border:2px solid var(--border); border-radius:12px; color:var(--text); font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer; margin-bottom:9px; }
+    .retry-btn { width:100%; padding:11px; background:linear-gradient(135deg,var(--accent),#8b5cf6); border:none; border-radius:12px; color:white; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer; }
+
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:11px 22px; font-size:13px; font-weight:700; color:var(--text); box-shadow:0 8px 30px #0008; transition:transform 0.3s cubic-bezier(.4,0,.2,1); z-index:999; white-space:nowrap; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="homeScreen" class="screen active">
+  <div class="lock-icon">📋</div>
+  <div class="lock-title">Test Varag'i</div>
+  <div class="lock-sub">Test kodini kiriting</div>
+  <div class="card">
+    <label>Test kodi</label>
+    <div class="input-row">
+      <input class="text-input" id="codeInput" type="text" placeholder="XXXX" maxlength="10" autocomplete="off"/>
+      <button class="icon-btn" onclick="startTest()">→</button>
+    </div>
+    <div class="error-msg" id="codeError">❌ Noto'g'ri kod!</div>
+    <div class="home-btns">
+      <button class="outline-btn" onclick="showScreen('adminLogin')">⚙️ Admin panel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLogin" class="screen">
+  <div class="lock-icon" style="font-size:46px">⚙️</div>
+  <div class="lock-title">Admin Panel</div>
+  <div class="lock-sub">Admin parolini kiriting</div>
+  <div class="card">
+    <label>Parol</label>
+    <div class="input-row">
+      <input class="text-input" id="adminPass" type="password" placeholder="****" maxlength="30" autocomplete="off"/>
+      <button class="icon-btn" onclick="checkAdmin()">→</button>
+    </div>
+    <div class="error-msg" id="adminError">❌ Noto'g'ri parol!</div>
+    <div class="home-btns">
+      <button class="outline-btn" onclick="showScreen('homeScreen')">← Orqaga</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminScreen" class="screen">
+  <div class="admin-header">
+    <div class="admin-title">⚙️ Admin Panel</div>
+    <button class="back-btn" onclick="showScreen('homeScreen')">← Chiqish</button>
+  </div>
+
+  <div class="admin-section">
+    <h3>Test kodi</h3>
+    <div class="code-setup">
+      <input class="code-field" id="adminTestCode" placeholder="Test kodi" maxlength="10"/>
+      <button class="save-btn" onclick="saveCode()">Saqlash</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);padding-bottom:4px">
+      Joriy kod: <span id="currentCodeDisplay" style="color:var(--accent);font-weight:700">—</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="admin-section">
+    <h3>To'g'ri javoblar: 1–32 (ABCD)</h3>
+    <div class="admin-grid" id="adminGrid1"></div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="admin-section">
+    <h3>To'g'ri javoblar: 33–35 (ABCDEF)</h3>
+    <div class="admin-grid" id="adminGrid2"></div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="admin-section">
+    <h3>Yozma javob kalitlari: 36–45</h3>
+    <div id="adminWrittenGrid"></div>
+  </div>
+
+  <div style="padding:14px 14px 32px">
+    <button class="save-btn" style="width:100%;padding:13px;font-size:14px" onclick="saveAll()">💾 Barcha javoblarni saqlash</button>
+  </div>
+</div>
+
+<!-- MAIN TEST -->
+<div id="mainApp" class="screen">
+  <div class="app-header">
+    <div class="header-top">
+      <div class="app-title">📝 Test Varag'i</div>
+      <div class="badge badge-blue" id="codeChip">—</div>
+    </div>
+    <div class="student-info">
+      <div class="info-chip">Savollar: <span>45</span></div>
+      <div class="info-chip">To'ldirilgan: <span id="filledCount">0</span></div>
+    </div>
+  </div>
+
+  <div class="section-wrapper">
+    <div class="section-header">
+      <div class="section-dot" style="background:#6c63ff;box-shadow:0 0 8px #6c63ff88"></div>
+      <div class="section-label" style="color:#6c63ff">A / B / C / D</div>
+      <div class="section-range">1 – 32</div>
+    </div>
+    <div class="abcd-grid" id="abcdGrid"></div>
+  </div>
+  <div class="divider"></div>
+  <div class="section-wrapper">
+    <div class="section-header">
+      <div class="section-dot" style="background:#43e97b;box-shadow:0 0 8px #43e97b88"></div>
+      <div class="section-label" style="color:#43e97b">A / B / C / D / E / F</div>
+      <div class="section-range">33 – 35</div>
+    </div>
+    <div class="abcd-grid" id="abcdefGrid"></div>
+  </div>
+  <div class="divider"></div>
+  <div class="section-wrapper">
+    <div class="section-header">
+      <div class="section-dot" style="background:#ff6584;box-shadow:0 0 8px #ff658488"></div>
+      <div class="section-label" style="color:#ff6584">Yozma javob</div>
+      <div class="section-range">36 – 45</div>
+    </div>
+    <div class="written-grid" id="writtenGrid"></div>
+  </div>
+
+  <div class="submit-area">
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 45 to'ldirilgan</div>
+    <button class="submit-btn" onclick="submitAnswers()">✅ Natijani ko'rish</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="resultScreen" class="screen">
+  <div class="result-card">
+    <div class="result-title">🎯 Sizning natijangiz</div>
+    <div class="score-big" id="scorePct">0%</div>
+    <div class="score-sub" id="scoreDetail">0 / 45 to'g'ri</div>
+    <div class="stats-row">
+      <div class="stat-box stat-correct"><div class="stat-num" id="statCorrect">0</div><div class="stat-lbl">✅ To'g'ri</div></div>
+      <div class="stat-box stat-wrong"><div class="stat-num" id="statWrong">0</div><div class="stat-lbl">❌ Noto'g'ri</div></div>
+      <div class="stat-box stat-empty"><div class="stat-num" id="statEmpty">0</div><div class="stat-lbl">⬜ Bo'sh</div></div>
+    </div>
+    <button class="detail-btn" onclick="showDetail()">📊 Batafsil ko'rish</button>
+    <button class="retry-btn" onclick="retryTest()">🔄 Qayta urinish</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  // ===== ADMIN PASSWORD (shu yerdan o'zgartiring) =====
+  const ADMIN_PASSWORD = 'admin123';
+
+  // ===== DATA (localStorage) =====
+  function loadData() { try { return JSON.parse(localStorage.getItem('testData') || '{}'); } catch { return {}; } }
+  function saveData(d) { localStorage.setItem('testData', JSON.stringify(d)); }
+  let data = loadData();
+  if (!data.testCode) data.testCode = '';
+  if (!data.answers) data.answers = {};
+
+  // ===== USER STATE =====
+  const userAnswers = {};
+  const TOTAL = 45;
+
+  // ===== SCREENS =====
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ===== HOME =====
+  function startTest() {
+    const code = document.getElementById('codeInput').value.trim();
+    if (!code) { showErr('codeError', 'Iltimos kodni kiriting!'); return; }
+    if (data.testCode && code !== data.testCode) { showErr('codeError', '❌ Noto\'g\'ri kod!'); return; }
+    document.getElementById('codeError').style.display = 'none';
+    document.getElementById('codeChip').textContent = '🔑 ' + code;
+    buildTestApp();
+    showScreen('mainApp');
+  }
+  document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key==='Enter') startTest(); });
+
+  // ===== ADMIN =====
+  function checkAdmin() {
+    if (document.getElementById('adminPass').value !== ADMIN_PASSWORD) {
+      showErr('adminError', '❌ Noto\'g\'ri parol!'); return;
+    }
+    document.getElementById('adminError').style.display = 'none';
+    document.getElementById('adminPass').value = '';
+    buildAdminPanel();
+    showScreen('adminScreen');
+  }
+  document.getElementById('adminPass').addEventListener('keydown', e => { if (e.key==='Enter') checkAdmin(); });
+
+  function buildAdminPanel() {
+    document.getElementById('adminTestCode').value = data.testCode || '';
+    document.getElementById('currentCodeDisplay').textContent = data.testCode || '(belgilanmagan)';
+    // Grid 1-32
+    const g1 = document.getElementById('adminGrid1');
+    g1.innerHTML = '';
+    for (let i = 1; i <= 32; i++) {
+      const row = document.createElement('div');
+      row.className = 'admin-row';
+      row.innerHTML = `<div class="a-num">${i}</div><div class="opts-row" id="aopts-${i}"></div>`;
+      g1.appendChild(row);
+      const optRow = row.querySelector('.opts-row');
+      ['A','B','C','D'].forEach(o => {
+        const btn = document.createElement('button');
+        btn.className = 'a-btn' + (data.answers[i]===o ? ` sel-${o}` : '');
+        btn.textContent = o;
+        btn.onclick = () => { optRow.querySelectorAll('.a-btn').forEach(b => b.className='a-btn'); btn.classList.add(`sel-${o}`); data.answers[i]=o; };
+        optRow.appendChild(btn);
+      });
+    }
+    // Grid 33-35
+    const g2 = document.getElementById('adminGrid2');
+    g2.innerHTML = '';
+    for (let i = 33; i <= 35; i++) {
+      const row = document.createElement('div');
+      row.className = 'admin-row';
+      row.innerHTML = `<div class="a-num">${i}</div><div class="opts-row" id="aopts-${i}"></div>`;
+      g2.appendChild(row);
+      const optRow = row.querySelector('.opts-row');
+      ['A','B','C','D','E','F'].forEach(o => {
+        const btn = document.createElement('button');
+        btn.className = 'a-btn' + (data.answers[i]===o ? ` sel-${o}` : '');
+        btn.textContent = o;
+        btn.onclick = () => { optRow.querySelectorAll('.a-btn').forEach(b => b.className='a-btn'); btn.classList.add(`sel-${o}`); data.answers[i]=o; };
+        optRow.appendChild(btn);
+      });
+    }
+    // Written 36-45
+    const gw = document.getElementById('adminWrittenGrid');
+    gw.innerHTML = '';
+    for (let i = 36; i <= 45; i++) {
+      const div = document.createElement('div');
+      div.className = 'wk-row';
+      div.innerHTML = `
+        <div class="wk-label">${i}-savol kalit so'zlari (yozma javobni tekshirish uchun)</div>
+        <div class="wk-parts">
+          <div class="wk-part"><div class="wk-label">a)</div><textarea class="wk-input" id="wk-${i}-a" rows="2" placeholder="a kalit...">${data.answers[`${i}-a`]||''}</textarea></div>
+          <div class="wk-part"><div class="wk-label">b)</div><textarea class="wk-input" id="wk-${i}-b" rows="2" placeholder="b kalit...">${data.answers[`${i}-b`]||''}</textarea></div>
+        </div>`;
+      gw.appendChild(div);
+    }
+  }
+
+  function saveCode() {
+    data.testCode = document.getElementById('adminTestCode').value.trim();
+    saveData(data);
+    document.getElementById('currentCodeDisplay').textContent = data.testCode || '(belgilanmagan)';
+    showToast('✅ Kod saqlandi!');
+  }
+
+  function saveAll() {
+    data.testCode = document.getElementById('adminTestCode').value.trim();
+    for (let i = 36; i <= 45; i++) {
+      ['a','b'].forEach(p => {
+        const el = document.getElementById(`wk-${i}-${p}`);
+        if (el) data.answers[`${i}-${p}`] = el.value.trim();
+      });
+    }
+    saveData(data);
+    document.getElementById('currentCodeDisplay').textContent = data.testCode || '(belgilanmagan)';
+    showToast('✅ Barcha javoblar saqlandi!');
+  }
+
+  // ===== BUILD TEST =====
+  function buildTestApp() {
+    document.getElementById('abcdGrid').innerHTML = '';
+    document.getElementById('abcdefGrid').innerHTML = '';
+    document.getElementById('writtenGrid').innerHTML = '';
+    Object.keys(userAnswers).forEach(k => delete userAnswers[k]);
+
+    for (let i = 1; i <= 32; i++) addOptRow(i, ['A','B','C','D'], 'abcdGrid');
+    for (let i = 33; i <= 35; i++) addOptRow(i, ['A','B','C','D','E','F'], 'abcdefGrid');
+    for (let i = 36; i <= 45; i++) addWrittenRow(i);
+    updateProgress();
+  }
+
+  function addOptRow(i, opts, gridId) {
+    const grid = document.getElementById(gridId);
+    const row = document.createElement('div');
+    row.className = 'abcd-row';
+    row.innerHTML = `<div class="q-num">${i}</div><div class="options-row" id="opts-${i}"></div>`;
+    grid.appendChild(row);
+    const optRow = row.querySelector('.options-row');
+    opts.forEach(o => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn'; btn.textContent = o; btn.id = `ubtn-${i}-${o}`;
+      btn.onclick = () => { optRow.querySelectorAll('.opt-btn').forEach(b => b.className='opt-btn'); btn.classList.add(`selected-${o}`); userAnswers[i]=o; updateProgress(); };
+      optRow.appendChild(btn);
+    });
+  }
+
+  function addWrittenRow(i) {
+    const grid = document.getElementById('writtenGrid');
+    const row = document.createElement('div');
+    row.className = 'written-row';
+    row.innerHTML = `
+      <div class="written-num">${i}-savol</div>
+      <div class="written-parts">
+        <div class="written-part">
+          <div class="part-label">a)</div>
+          <textarea class="written-input" id="w-${i}-a" rows="2" placeholder="a javob..."></textarea>
+          <div class="answer-hint" id="hint-${i}-a"></div>
+        </div>
+        <div class="written-part">
+          <div class="part-label">b)</div>
+          <textarea class="written-input" id="w-${i}-b" rows="2" placeholder="b javob..."></textarea>
+          <div class="answer-hint" id="hint-${i}-b"></div>
+        </div>
+      </div>`;
+    grid.appendChild(row);
+    ['a','b'].forEach(p => {
+      const ta = row.querySelector(`#w-${i}-${p}`);
+      ta.addEventListener('input', () => { userAnswers[`${i}-${p}`] = ta.value.trim(); updateProgress(); });
+    });
+  }
+
+  function updateProgress() {
+    let filled = 0;
+    for (let i = 1; i <= 35; i++) if (userAnswers[i]) filled++;
+    for (let i = 36; i <= 45; i++) if (userAnswers[`${i}-a`] || userAnswers[`${i}-b`]) filled++;
+    const pct = Math.round((filled / TOTAL) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = `${filled} / ${TOTAL} to'ldirilgan`;
+    document.getElementById('filledCount').textContent = filled;
+  }
+
+  // ===== SUBMIT =====
+  function submitAnswers() {
+    const ans = data.answers;
+    let correct = 0, wrong = 0, empty = 0;
+
+    // 1-35
+    for (let i = 1; i <= 35; i++) {
+      const u = userAnswers[i] || '';
+      const c = ans[i] || '';
+      const optRow = document.getElementById(`opts-${i}`);
+      if (optRow) optRow.querySelectorAll('.opt-btn').forEach(b => b.className = 'opt-btn');
+
+      if (!c) { if (u) correct++; else empty++; }
+      else if (!u) {
+        empty++;
+        const mb = document.getElementById(`ubtn-${i}-${c}`);
+        if (mb) mb.classList.add('missed');
+      } else if (u === c) {
+        correct++;
+        const mb = document.getElementById(`ubtn-${i}-${u}`);
+        if (mb) mb.classList.add('correct');
+      } else {
+        wrong++;
+        const wb = document.getElementById(`ubtn-${i}-${u}`);
+        if (wb) wb.classList.add('wrong');
+        const mb = document.getElementById(`ubtn-${i}-${c}`);
+        if (mb) mb.classList.add('missed');
+      }
+    }
+
+    // 36-45
+    for (let i = 36; i <= 45; i++) {
+      ['a','b'].forEach(p => {
+        const u = (userAnswers[`${i}-${p}`] || '').toLowerCase().trim();
+        const c = (ans[`${i}-${p}`] || '').toLowerCase().trim();
+        const ta = document.getElementById(`w-${i}-${p}`);
+        const hint = document.getElementById(`hint-${i}-${p}`);
+        if (!ta) return;
+        ta.readOnly = true;
+        if (!c) { if (u) correct++; else empty++; }
+        else if (!u) {
+          empty++;
+          ta.classList.add('wrong-input');
+          hint.textContent = '✅ To\'g\'ri javob: ' + ans[`${i}-${p}`];
+          hint.style.display = 'block';
+        } else if (u.includes(c) || c.includes(u)) {
+          correct++;
+          ta.classList.add('correct-input');
+        } else {
+          wrong++;
+          ta.classList.add('wrong-input');
+          hint.textContent = '✅ To\'g\'ri javob: ' + ans[`${i}-${p}`];
+          hint.style.display = 'block';
+        }
+      });
+    }
+
+    const pct = Math.round((correct / TOTAL) * 100);
+    document.getElementById('scorePct').textContent = pct + '%';
+    document.getElementById('scoreDetail').textContent = `${correct} / ${TOTAL} to'g'ri`;
+    document.getElementById('statCorrect').textContent = correct;
+    document.getElementById('statWrong').textContent = wrong;
+    document.getElementById('statEmpty').textContent = empty;
+
+    if (tg) tg.sendData(JSON.stringify({ correct, wrong, empty, pct }));
+    showScreen('resultScreen');
+  }
+
+  function showDetail() { showScreen('mainApp'); document.getElementById('mainApp').scrollTop = 0; }
+
+  function retryTest() {
+    // reset written inputs
+    for (let i = 36; i <= 45; i++) {
+      ['a','b'].forEach(p => {
+        const ta = document.getElementById(`w-${i}-${p}`);
+        const hint = document.getElementById(`hint-${i}-${p}`);
+        if (ta) { ta.readOnly=false; ta.value=''; ta.className='written-input'; }
+        if (hint) { hint.style.display='none'; hint.textContent=''; }
+      });
+    }
+    buildTestApp();
+    showScreen('mainApp');
+    document.getElementById('mainApp').scrollTop = 0;
+  }
+
+  function showErr(id, msg) { const el=document.getElementById(id); el.textContent=msg; el.style.display='block'; }
+  function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+</script>
+</body>
+</html>
