@@ -3,478 +3,684 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Test Varag'i</title>
+<title>SertTest — Milliy Sertifikat Tizimi</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#0f1117;--surface:#1a1d27;--surface2:#222538;
-  --accent:#6c63ff;--accent2:#ff6584;--accent3:#43e97b;
-  --text:#e8eaf6;--muted:#7b7fa3;--border:#2e3150;--radius:14px;
+  --bg:#080b14;
+  --s1:#0e1220;
+  --s2:#141926;
+  --s3:#1c2236;
+  --acc:#4f8ef7;
+  --acc2:#f7614f;
+  --acc3:#4fd984;
+  --acc4:#f7c44f;
+  --text:#dde3f5;
+  --muted:#6b7399;
+  --border:#1f2640;
+  --r:12px;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-.screen{display:none;min-height:100vh;}
-.screen.active{display:flex;flex-direction:column;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.screen{display:none;min-height:100vh;flex-direction:column;}
+.screen.active{display:flex;}
 
-/* ── CENTERED SCREENS ── */
-#homeScreen,#adminLogin{
-  align-items:center;justify-content:center;padding:24px;
-  background:radial-gradient(ellipse at 50% 0%,#1e1b4b 0%,var(--bg) 70%);
-}
-.lock-icon{font-size:52px;margin-bottom:14px;filter:drop-shadow(0 0 20px #6c63ff88);animation:pulse 2s ease-in-out infinite;}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-.lock-title{font-size:24px;font-weight:900;margin-bottom:5px;}
-.lock-sub{font-size:13px;color:var(--muted);margin-bottom:26px;text-align:center;max-width:280px;}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;max-width:340px;box-shadow:0 8px 40px #0008;}
-.card label{display:block;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;}
-.input-row{display:flex;gap:10px;}
-.text-input{flex:1;background:var(--surface2);border:2px solid var(--border);border-radius:10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;padding:11px 14px;letter-spacing:3px;outline:none;transition:border-color 0.2s;}
-.text-input:focus{border-color:var(--accent);}
-.text-input::placeholder{color:#3a3d5a;}
-.icon-btn{background:linear-gradient(135deg,var(--accent),#8b5cf6);color:white;border:none;border-radius:10px;padding:11px 20px;font-size:20px;cursor:pointer;transition:opacity 0.2s,transform 0.1s;}
-.icon-btn:active{transform:scale(0.95);opacity:0.85;}
-.err{margin-top:10px;font-size:13px;color:var(--accent2);font-weight:600;display:none;text-align:center;}
-.home-btns{display:flex;flex-direction:column;gap:8px;margin-top:13px;}
-.outline-btn{background:transparent;border:2px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:10px;cursor:pointer;transition:all 0.2s;}
-.outline-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* ── SPLASH ── */
+#splash{align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 20%,#0d1f4a,var(--bg) 65%);}
+.splash-logo{font-size:60px;margin-bottom:16px;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.splash-title{font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:4px;}
+.splash-sub{font-size:13px;color:var(--muted);margin-bottom:36px;text-align:center;}
+.splash-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:340px;}
+.inp-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.inp-row{display:flex;gap:9px;}
+.inp{flex:1;background:var(--s3);border:2px solid var(--border);border-radius:10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;padding:11px 14px;letter-spacing:3px;outline:none;transition:border-color .2s;}
+.inp:focus{border-color:var(--acc);}
+.inp::placeholder{color:#2a3050;}
+.go-btn{background:var(--acc);color:white;border:none;border-radius:10px;padding:11px 18px;font-size:18px;cursor:pointer;transition:opacity .2s,transform .1s;}
+.go-btn:active{transform:scale(.95);opacity:.85;}
+.err{font-size:12px;color:var(--acc2);font-weight:600;margin-top:9px;display:none;text-align:center;}
+.link-row{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+.ghost-btn{background:transparent;border:1.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Sora',sans-serif;font-size:13px;font-weight:600;padding:10px;cursor:pointer;transition:all .2s;}
+.ghost-btn:hover{border-color:var(--acc);color:var(--acc);}
+
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom);}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;transition:all .2s;gap:3px;}
+.bnav-icon{font-size:20px;}
+.bnav-lbl{font-size:10px;font-weight:700;color:var(--muted);}
+.bnav-item.active .bnav-lbl{color:var(--acc);}
+.bnav-item.active .bnav-icon{filter:drop-shadow(0 0 6px var(--acc));}
+
+/* ── MAIN LAYOUT ── */
+.page{display:none;flex:1;overflow-y:auto;padding-bottom:72px;}
+.page.active{display:block;}
+.top-bar{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;}
+.top-title{font-size:16px;font-weight:800;}
+.top-sub{font-size:11px;color:var(--muted);}
+.top-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:#4f8ef722;color:var(--acc);border:1px solid #4f8ef733;}
+
+/* ── DASHBOARD ── */
+.dash-hero{padding:20px 16px 0;}
+.hero-greeting{font-size:13px;color:var(--muted);margin-bottom:4px;}
+.hero-name{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:16px;}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.stat-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
+.stat-card .ic{font-size:24px;margin-bottom:6px;}
+.stat-card .val{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;}
+.stat-card .lbl{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;}
+.best-grade{font-size:11px;font-weight:800;padding:2px 8px;border-radius:8px;display:inline-block;margin-top:4px;}
+
+.section-title{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:0 16px;margin-bottom:10px;}
+
+/* Recent results */
+.result-list{padding:0 16px;display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.result-item{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.ri-grade{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;flex-shrink:0;border:2px solid;}
+.ri-info{flex:1;}
+.ri-code{font-size:13px;font-weight:700;}
+.ri-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.ri-score{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--acc3);}
+
+/* Best band */
+.cert-strip{margin:0 16px 20px;border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.cs-icon{font-size:32px;}
+.cs-info .cs-title{font-size:15px;font-weight:800;}
+.cs-info .cs-sub{font-size:12px;opacity:.7;margin-top:2px;}
+
+/* Active test card */
+.active-test-card{margin:0 16px 20px;background:linear-gradient(135deg,#0d1f4a,#0e2235);border:1px solid #1a3060;border-radius:var(--r);padding:16px;cursor:pointer;}
+.atc-lbl{font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.atc-code{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;margin-bottom:4px;}
+.atc-sub{font-size:12px;color:var(--muted);}
+.atc-arrow{font-size:20px;margin-top:10px;}
+
+/* ── TESTS PAGE ── */
+.tests-wrap{padding:16px;display:flex;flex-direction:column;gap:10px;}
+.test-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:border-color .2s;}
+.test-card:hover{border-color:var(--acc);}
+.tc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.tc-code{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;}
+.tc-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.st-active{background:#4f8ef722;color:var(--acc);border:1px solid #4f8ef733;}
+.st-done{background:#4fd98422;color:var(--acc3);border:1px solid #4fd98433;}
+.tc-meta{font-size:12px;color:var(--muted);}
+.tc-progress{margin-top:10px;}
+.prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--acc);border-radius:2px;}
+
+/* ── TEST TAKING ── */
+#testScreen{overflow-y:auto;padding-bottom:0;}
+.test-header{background:var(--s1);border-bottom:1px solid var(--border);padding:12px 14px;position:sticky;top:0;z-index:100;}
+.th-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.th-title{font-size:15px;font-weight:800;}
+.th-close{background:var(--s3);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-weight:700;padding:5px 11px;cursor:pointer;}
+.th-chips{display:flex;gap:6px;}
+.th-chip{font-size:11px;background:var(--s3);border:1px solid var(--border);border-radius:7px;padding:3px 9px;color:var(--muted);}
+.th-chip span{color:var(--text);font-weight:700;}
+.swrap{padding:12px 12px 0;}
+.shdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.slbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;}
+.srng{font-size:11px;color:var(--muted);margin-left:auto;}
+.q-grid{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.q-row{display:grid;grid-template-columns:26px 1fr;align-items:center;gap:6px;}
+.qn{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);text-align:right;}
+.opts{display:flex;gap:4px;}
+.ob{flex:1;height:33px;border-radius:8px;border:2px solid var(--border);background:var(--s3);color:var(--muted);font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
+.ob:active{transform:scale(.93);}
+.ob.sel-A{background:#4fd98422;border-color:#4fd984;color:#4fd984}
+.ob.sel-B{background:#4f8ef722;border-color:#4f8ef7;color:#4f8ef7}
+.ob.sel-C{background:#f7614f22;border-color:#f7614f;color:#f7614f}
+.ob.sel-D{background:#f7c44f22;border-color:#f7c44f;color:#f7c44f}
+.ob.sel-E{background:#c084fc22;border-color:#c084fc;color:#c084fc}
+.ob.sel-F{background:#fb923c22;border-color:#fb923c;color:#fb923c}
+.ob.correct{background:#4fd98433;border-color:#4fd984;color:#4fd984}
+.ob.wrong{background:#f7614f33;border-color:#f7614f;color:#f7614f}
+.ob.missed{background:#f7c44f33;border-color:#f7c44f;color:#f7c44f}
+.w-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.w-row{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:11px 12px;}
+.w-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--acc);margin-bottom:7px;}
+.w-parts{display:flex;gap:7px;}
+.w-part{flex:1;display:flex;flex-direction:column;gap:3px;}
+.w-plbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;}
+.w-inp{background:var(--s3);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:12px;font-weight:600;padding:7px 9px;outline:none;resize:none;width:100%;transition:border-color .2s;}
+.w-inp:focus{border-color:var(--acc);}
+.w-inp::placeholder{color:#2a3050;}
+.w-inp.ci{border-color:#4fd984;background:#4fd98411;}
+.w-inp.wi{border-color:#f7614f;background:#f7614f11;}
+.w-hint{font-size:11px;color:#f7c44f;font-weight:700;margin-top:2px;display:none;}
+.sub-area{padding:12px;padding-bottom:24px;}
+.p-wrap{background:var(--s3);border-radius:8px;height:4px;margin-bottom:9px;overflow:hidden;}
+.p-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc3));border-radius:8px;transition:width .4s;}
+.p-lbl{font-size:11px;color:var(--muted);margin-bottom:9px;text-align:center;}
+.sub-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--acc),var(--acc3));border:none;border-radius:var(--r);color:white;font-family:'Sora',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .2s,transform .1s;}
+.sub-btn:active{transform:scale(.98);opacity:.88;}
+.divider{height:1px;background:var(--border);margin:4px 12px 12px;}
+
+/* ── RESULT SCREEN ── */
+#resultDetailScreen{overflow-y:auto;padding-bottom:80px;}
+.res-hero{padding:24px 16px;background:linear-gradient(180deg,#0a1a38,transparent);}
+.res-grade-wrap{text-align:center;margin-bottom:20px;}
+.res-grade-ring{display:inline-flex;align-items:center;justify-content:center;width:100px;height:100px;border-radius:50%;font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;border:3px solid;margin-bottom:8px;position:relative;}
+.res-grade-ring::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid;opacity:.3;}
+.res-grade-name{font-size:14px;font-weight:700;color:var(--muted);}
+.res-score-big{font-family:'JetBrains Mono',monospace;font-size:54px;font-weight:700;text-align:center;color:var(--acc3);line-height:1;margin-bottom:2px;}
+.res-score-sub{text-align:center;font-size:12px;color:var(--muted);margin-bottom:20px;}
+.theta-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin:0 16px 16px;display:flex;gap:12px;align-items:center;}
+.theta-ic{font-size:28px;}
+.theta-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:#60a5fa;}
+.theta-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.theta-desc{font-size:12px;color:var(--text);margin-top:2px;}
+.res-stats{display:flex;gap:8px;padding:0 16px;margin-bottom:14px;}
+.rs-box{flex:1;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;}
+.rs-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;}
+.rs-lbl{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;}
+.rs-c .rs-num{color:#4fd984}.rs-w .rs-num{color:#f7614f}.rs-e .rs-num{color:#f7c44f}
+.breakdown{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin:0 16px 14px;}
+.bk-ttl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+.bk-row{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.bk-lbl{font-size:11px;color:var(--muted);width:75px;flex-shrink:0;}
+.bk-bw{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden;}
+.bk-bf{height:100%;border-radius:4px;transition:width .6s .2s;}
+.bk-pct{font-size:12px;font-weight:700;width:34px;text-align:right;}
+.cert-card{margin:0 16px 14px;border-radius:var(--r);padding:16px;text-align:center;}
+.cc-badge{font-size:32px;margin-bottom:6px;}
+.cc-title{font-size:16px;font-weight:800;margin-bottom:3px;}
+.cc-sub{font-size:12px;opacity:.7;}
+.res-actions{padding:0 16px;display:flex;flex-direction:column;gap:8px;}
+.det-btn{padding:12px;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.retry-btn{padding:12px;background:linear-gradient(135deg,var(--acc),#7c3aed);border:none;border-radius:var(--r);color:white;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+
+/* ── HISTORY PAGE ── */
+.hist-wrap{padding:16px;display:flex;flex-direction:column;gap:8px;}
+.hist-item{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;gap:12px;align-items:center;cursor:pointer;}
+.hi-grade{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;flex-shrink:0;border:2px solid;}
+.hi-info{flex:1;}
+.hi-code{font-size:13px;font-weight:700;}
+.hi-date{font-size:11px;color:var(--muted);margin-top:2px;}
+.hi-details{font-size:11px;color:var(--muted);margin-top:4px;}
+.hi-score{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-icon{font-size:48px;margin-bottom:12px;opacity:.5;}
+.empty-lbl{font-size:14px;font-weight:600;}
+
+/* ── PROFILE PAGE ── */
+.prof-wrap{padding:16px;}
+.prof-hero{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:14px;}
+.ph-avatar{font-size:52px;margin-bottom:10px;}
+.ph-name{font-size:18px;font-weight:800;margin-bottom:3px;}
+.ph-sub{font-size:12px;color:var(--muted);}
+.ph-chips{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap;}
+.ph-chip{font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;background:var(--s3);border:1px solid var(--border);color:var(--muted);}
+.prof-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.ps-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;}
+.ps-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;}
+.ps-lbl{font-size:10px;color:var(--muted);font-weight:700;margin-top:2px;}
+.grade-history{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;}
+.gh-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+.gh-bars{display:flex;align-items:flex-end;gap:6px;height:80px;}
+.gh-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;}
+.gh-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .6s;}
+.gh-lbl{font-size:9px;color:var(--muted);font-weight:700;}
 
 /* ── ADMIN ── */
 #adminScreen{overflow-y:auto;}
-.admin-header{background:linear-gradient(135deg,#1a1d27,#222538);border-bottom:1px solid var(--border);padding:13px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;}
-.admin-title{font-size:15px;font-weight:900;}
-.back-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-weight:700;padding:6px 12px;cursor:pointer;}
+.admin-top{background:var(--s1);border-bottom:1px solid var(--border);padding:13px 14px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;}
+.at-title{font-size:15px;font-weight:800;}
+.at-back{background:var(--s3);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-weight:700;padding:6px 12px;cursor:pointer;}
 .asec{padding:13px 13px 0;}
 .asec h3{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
-.code-row{display:flex;gap:9px;margin-bottom:9px;}
-.cf{flex:1;background:var(--surface2);border:2px solid var(--border);border-radius:10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;padding:9px 12px;outline:none;transition:border-color 0.2s;letter-spacing:2px;}
-.cf:focus{border-color:var(--accent);}
-.sv{background:linear-gradient(135deg,var(--accent),var(--accent3));border:none;border-radius:10px;color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;padding:9px 15px;cursor:pointer;}
-.agrid{display:flex;flex-direction:column;gap:4px;margin-bottom:13px;}
-.arow{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:7px;}
-.anum{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);text-align:right;}
-.aopts{display:flex;gap:4px;}
-.ab{flex:1;height:30px;border-radius:7px;border:2px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all 0.15s;}
-/* also store difficulty in admin */
-.diff-input{width:100%;background:var(--surface2);border:2px solid var(--border);border-radius:7px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 8px;outline:none;margin-top:4px;}
-.diff-input:focus{border-color:#fbbf24;}
-.ab.sel-A{background:#4ade8022;border-color:#4ade80;color:#4ade80}
-.ab.sel-B{background:#60a5fa22;border-color:#60a5fa;color:#60a5fa}
-.ab.sel-C{background:#f472b622;border-color:#f472b6;color:#f472b6}
-.ab.sel-D{background:#fb923c22;border-color:#fb923c;color:#fb923c}
-.ab.sel-E{background:#a78bfa22;border-color:#a78bfa;color:#a78bfa}
-.ab.sel-F{background:#fbbf2422;border-color:#fbbf24;color:#fbbf24}
-.wkrow{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;}
-.wklbl{font-size:11px;font-weight:800;color:var(--muted);margin-bottom:5px;}
-.wkparts{display:flex;gap:7px;}
-.wkp{flex:1;}
-.wki{background:var(--surface2);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;padding:7px 9px;outline:none;resize:none;width:100%;transition:border-color 0.2s;}
-.wki:focus{border-color:var(--accent);}
-.divider{height:1px;background:var(--border);margin:4px 13px 13px;}
+.a-inp-row{display:flex;gap:8px;margin-bottom:9px;}
+.a-inp{flex:1;background:var(--s3);border:2px solid var(--border);border-radius:9px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;padding:9px 12px;outline:none;letter-spacing:2px;transition:border-color .2s;}
+.a-inp:focus{border-color:var(--acc);}
+.a-sv{background:var(--acc);border:none;border-radius:9px;color:white;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;padding:9px 15px;cursor:pointer;}
+.a-grid{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.a-row{display:grid;grid-template-columns:26px 1fr;align-items:center;gap:6px;}
+.a-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);text-align:right;}
+.a-opts{display:flex;gap:4px;}
+.a-ob{flex:1;height:30px;border-radius:7px;border:2px solid var(--border);background:var(--s3);color:var(--muted);font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
+.a-ob.sel-A{background:#4fd98422;border-color:#4fd984;color:#4fd984}
+.a-ob.sel-B{background:#4f8ef722;border-color:#4f8ef7;color:#4f8ef7}
+.a-ob.sel-C{background:#f7614f22;border-color:#f7614f;color:#f7614f}
+.a-ob.sel-D{background:#f7c44f22;border-color:#f7c44f;color:#f7c44f}
+.a-ob.sel-E{background:#c084fc22;border-color:#c084fc;color:#c084fc}
+.a-ob.sel-F{background:#fb923c22;border-color:#fb923c;color:#fb923c}
+.diff-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px;}
+.diff-cell{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:6px 7px;}
+.diff-num{font-size:10px;color:var(--muted);font-weight:700;margin-bottom:3px;}
+.diff-val{width:100%;background:var(--s3);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 6px;outline:none;transition:border-color .2s;}
+.diff-val:focus{border-color:#f7c44f;}
+.wk-row{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:7px;}
+.wk-lbl{font-size:11px;font-weight:800;color:var(--muted);margin-bottom:5px;}
+.wk-parts{display:flex;gap:7px;}
+.wk-p{flex:1;}
+.wk-i{background:var(--s3);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:12px;font-weight:600;padding:7px 9px;outline:none;resize:none;width:100%;transition:border-color .2s;}
+.wk-i:focus{border-color:var(--acc);}
+.div{height:1px;background:var(--border);margin:4px 13px 13px;}
 
-/* ── MAIN TEST ── */
-#mainApp{overflow-y:auto;}
-.app-header{background:linear-gradient(135deg,#1a1d27,#222538);border-bottom:1px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:100;}
-.hrow{display:flex;align-items:center;justify-content:space-between;}
-.app-title{font-size:16px;font-weight:900;}
-.badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
-.badge-blue{background:#6c63ff22;color:var(--accent);border:1px solid #6c63ff44;}
-.chips{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;}
-.chip{font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:3px 9px;color:var(--muted);}
-.chip span{color:var(--text);font-weight:700;}
-.swrap{padding:12px 12px 0;}
-.shdr{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
-.sdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.slbl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;}
-.srng{font-size:11px;color:var(--muted);margin-left:auto;}
-.agr{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-.urow{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:6px;}
-.qn{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);text-align:right;}
-.optsr{display:flex;gap:4px;}
-.ob{flex:1;height:34px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.15s;}
-.ob:active{transform:scale(0.93);}
-.ob.sel-A{background:#4ade8022;border-color:#4ade80;color:#4ade80}
-.ob.sel-B{background:#60a5fa22;border-color:#60a5fa;color:#60a5fa}
-.ob.sel-C{background:#f472b622;border-color:#f472b6;color:#f472b6}
-.ob.sel-D{background:#fb923c22;border-color:#fb923c;color:#fb923c}
-.ob.sel-E{background:#a78bfa22;border-color:#a78bfa;color:#a78bfa}
-.ob.sel-F{background:#fbbf2422;border-color:#fbbf24;color:#fbbf24}
-.ob.correct{background:#4ade8033;border-color:#4ade80;color:#4ade80}
-.ob.wrong{background:#ff658433;border-color:#ff6584;color:#ff6584}
-.ob.missed{background:#fbbf2433;border-color:#fbbf24;color:#fbbf24}
-.wgrid{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
-.wrow{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;}
-.wnum{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);margin-bottom:7px;}
-.wparts{display:flex;gap:7px;}
-.wpart{flex:1;display:flex;flex-direction:column;gap:3px;}
-.plbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;}
-.wi{background:var(--surface2);border:2px solid var(--border);border-radius:9px;color:var(--text);font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;padding:7px 9px;outline:none;resize:none;width:100%;transition:border-color 0.2s;}
-.wi:focus{border-color:var(--accent);}
-.wi::placeholder{color:#3a3d5a;}
-.wi.correct-i{border-color:#4ade80;background:#4ade8011;}
-.wi.wrong-i{border-color:#ff6584;background:#ff658411;}
-.ahint{font-size:11px;color:#fbbf24;font-weight:700;margin-top:3px;display:none;}
-.sub-area{padding:12px;padding-bottom:28px;}
-.pbar-wrap{background:var(--surface2);border-radius:10px;height:5px;margin-bottom:10px;overflow:hidden;}
-.pbar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));border-radius:10px;transition:width 0.4s;}
-.plabel{font-size:12px;color:var(--muted);margin-bottom:10px;text-align:center;}
-.sub-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent3));border:none;border-radius:var(--radius);color:white;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 4px 24px #6c63ff44;transition:opacity 0.2s,transform 0.1s;}
-.sub-btn:active{transform:scale(0.98);opacity:0.88;}
+/* ── ADMIN LOGIN ── */
+#adminLoginScreen{align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#1a0d40,var(--bg) 70%);}
 
-/* ── RESULT ── */
-#resultScreen{align-items:center;justify-content:flex-start;overflow-y:auto;padding:20px 14px 40px;background:radial-gradient(ellipse at 50% 0%,#0a1f2e 0%,var(--bg) 55%);}
-.rcard{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px;width:100%;max-width:380px;box-shadow:0 8px 40px #0008;margin-bottom:12px;}
-
-/* Grade badge */
-.grade-wrap{text-align:center;margin-bottom:18px;}
-.grade-circle{display:inline-flex;align-items:center;justify-content:center;width:90px;height:90px;border-radius:50%;font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;border:3px solid;margin-bottom:8px;}
-.grade-label{font-size:13px;color:var(--muted);font-weight:700;}
-
-/* Rasch theta */
-.theta-row{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:14px;}
-.theta-icon{font-size:22px;}
-.theta-info{flex:1;}
-.theta-title{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
-.theta-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#60a5fa;}
-.theta-desc{font-size:11px;color:var(--muted);margin-top:2px;}
-
-.score-big{font-family:'JetBrains Mono',monospace;font-size:46px;font-weight:700;text-align:center;color:var(--accent3);filter:drop-shadow(0 0 16px #43e97b66);margin-bottom:2px;}
-.score-sub{text-align:center;font-size:13px;color:var(--muted);margin-bottom:14px;}
-
-.stats-row{display:flex;gap:8px;margin-bottom:14px;}
-.sbox{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center;}
-.snum{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;}
-.slbl{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;}
-.sc .snum{color:#4ade80}.sw .snum{color:#ff6584}.se .snum{color:#fbbf24}
-
-/* section breakdown */
-.breakdown{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:14px;}
-.bk-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
-.bk-row{display:flex;align-items:center;gap:9px;margin-bottom:7px;}
-.bk-lbl{font-size:12px;color:var(--muted);width:80px;flex-shrink:0;}
-.bk-bar-wrap{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
-.bk-bar{height:100%;border-radius:4px;transition:width 0.6s;}
-.bk-pct{font-size:12px;font-weight:700;width:36px;text-align:right;}
-
-/* cert band */
-.cert-band{border-radius:12px;padding:12px 14px;margin-bottom:14px;text-align:center;}
-.cert-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-.cert-desc{font-size:13px;font-weight:700;}
-
-.det-btn{width:100%;padding:11px;background:var(--surface2);border:2px solid var(--border);border-radius:12px;color:var(--text);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:8px;}
-.retry-btn{width:100%;padding:11px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border:none;border-radius:12px;color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;}
-
-.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 20px;font-size:13px;font-weight:700;color:var(--text);box-shadow:0 8px 30px #0008;transition:transform 0.3s cubic-bezier(.4,0,.2,1);z-index:999;white-space:nowrap;}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--text);box-shadow:0 6px 24px #0008;transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:999;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── LOADING ── */
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--muted);font-size:13px;gap:8px;}
+.spin{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
-<!-- HOME -->
-<div id="homeScreen" class="screen active">
-  <div class="lock-icon">📋</div>
-  <div class="lock-title">Test Varag'i</div>
-  <div class="lock-sub">Milliy sertifikat tizimi • Rasch model asosida baholash</div>
-  <div class="card">
-    <label>Test kodi</label>
-    <div class="input-row">
-      <input class="text-input" id="codeInput" type="text" placeholder="XXXX" maxlength="10" autocomplete="off"/>
-      <button class="icon-btn" onclick="startTest()">→</button>
+<!-- ═══ SPLASH / HOME ═══ -->
+<div id="splash" class="screen active">
+  <div class="splash-logo">🎓</div>
+  <div class="splash-title">SertTest</div>
+  <div class="splash-sub">Milliy sertifikat tizimi<br>Rasch modeli asosida baholash</div>
+  <div class="splash-card">
+    <div class="inp-lbl">Test kodi</div>
+    <div class="inp-row">
+      <input class="inp" id="codeInput" type="text" placeholder="XXXX" maxlength="12" autocomplete="off"/>
+      <button class="go-btn" onclick="startTest()">→</button>
     </div>
-    <div class="err" id="codeErr">❌ Noto'g'ri kod!</div>
-    <div class="home-btns">
-      <button class="outline-btn" onclick="showScreen('adminLogin')">⚙️ Admin panel</button>
-    </div>
-  </div>
-</div>
-
-<!-- ADMIN LOGIN -->
-<div id="adminLogin" class="screen">
-  <div class="lock-icon" style="font-size:44px">⚙️</div>
-  <div class="lock-title">Admin Panel</div>
-  <div class="lock-sub">Admin parolini kiriting</div>
-  <div class="card">
-    <label>Parol</label>
-    <div class="input-row">
-      <input class="text-input" id="adminPass" type="password" placeholder="****" maxlength="30" autocomplete="off"/>
-      <button class="icon-btn" onclick="checkAdmin()">→</button>
-    </div>
-    <div class="err" id="adminErr">❌ Noto'g'ri parol!</div>
-    <div class="home-btns">
-      <button class="outline-btn" onclick="showScreen('homeScreen')">← Orqaga</button>
+    <div class="err" id="codeErr"></div>
+    <div class="link-row">
+      <button class="ghost-btn" onclick="enterApp()">📊 Asosiy sahifaga kirish</button>
+      <button class="ghost-btn" onclick="showScreen('adminLoginScreen')">⚙️ Admin panel</button>
     </div>
   </div>
 </div>
 
-<!-- ADMIN PANEL -->
+<!-- ═══ ADMIN LOGIN ═══ -->
+<div id="adminLoginScreen" class="screen">
+  <div class="splash-logo" style="font-size:44px">⚙️</div>
+  <div class="splash-title" style="font-size:22px">Admin Panel</div>
+  <div class="splash-sub">Admin parolini kiriting</div>
+  <div class="splash-card">
+    <div class="inp-lbl">Parol</div>
+    <div class="inp-row">
+      <input class="inp" id="adminPass" type="password" placeholder="••••" maxlength="30" autocomplete="off"/>
+      <button class="go-btn" onclick="checkAdmin()">→</button>
+    </div>
+    <div class="err" id="adminErr"></div>
+    <div class="link-row">
+      <button class="ghost-btn" onclick="showScreen('splash')">← Orqaga</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN PANEL ═══ -->
 <div id="adminScreen" class="screen">
-  <div class="admin-header">
-    <div class="admin-title">⚙️ Admin Panel</div>
-    <button class="back-btn" onclick="showScreen('homeScreen')">← Chiqish</button>
+  <div class="admin-top">
+    <div class="at-title">⚙️ Admin Panel</div>
+    <button class="at-back" onclick="showScreen('splash')">← Chiqish</button>
   </div>
 
   <div class="asec">
     <h3>Test kodi</h3>
-    <div class="code-row">
-      <input class="cf" id="adminCode" placeholder="Test kodi" maxlength="10"/>
-      <button class="sv" onclick="saveCode()">Saqlash</button>
+    <div class="a-inp-row">
+      <input class="a-inp" id="adminCode" placeholder="Test kodi" maxlength="12"/>
+      <button class="a-sv" onclick="adminSaveCode()">Saqlash</button>
     </div>
-    <div style="font-size:12px;color:var(--muted);padding-bottom:4px">Joriy: <span id="curCode" style="color:var(--accent);font-weight:700">—</span></div>
+    <div style="font-size:12px;color:var(--muted);padding-bottom:4px">
+      Joriy: <span id="curCode" style="color:var(--acc);font-weight:700">—</span>
+    </div>
   </div>
-  <div class="divider"></div>
+  <div class="div"></div>
 
   <div class="asec">
-    <h3>Savol qiyinliklari (b) — Rasch parametri</h3>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-      Har bir savol uchun qiyinlik darajasini kiriting.<br>
-      <b style="color:#fbbf24">−2</b> = juda oson &nbsp;|&nbsp; <b style="color:var(--accent3)">0</b> = o'rtacha &nbsp;|&nbsp; <b style="color:var(--accent2)">+2</b> = juda qiyin
+    <h3>Savol qiyinliklari — Rasch b parametri</h3>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+      <b style="color:#f7c44f">−2.0</b> = juda oson &nbsp;·&nbsp;
+      <b style="color:var(--acc3)">0.0</b> = o'rtacha &nbsp;·&nbsp;
+      <b style="color:var(--acc2)">+2.0</b> = juda qiyin<br>
+      <span style="color:#888">Agar belgilanmasa, barcha savollar b=0 deb qabul qilinadi</span>
     </div>
-    <div id="diffGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;"></div>
+    <div class="diff-grid" id="diffGrid"></div>
   </div>
-  <div class="divider"></div>
+  <div class="div"></div>
 
   <div class="asec">
     <h3>To'g'ri javoblar: 1–32 (ABCD)</h3>
-    <div class="agrid" id="adminGrid1"></div>
+    <div class="a-grid" id="aGrid1"></div>
   </div>
-  <div class="divider"></div>
+  <div class="div"></div>
 
   <div class="asec">
     <h3>To'g'ri javoblar: 33–35 (ABCDEF)</h3>
-    <div class="agrid" id="adminGrid2"></div>
+    <div class="a-grid" id="aGrid2"></div>
   </div>
-  <div class="divider"></div>
+  <div class="div"></div>
 
   <div class="asec">
     <h3>Yozma javob kalitlari: 36–45</h3>
-    <div id="adminWritten"></div>
+    <div id="aWritten"></div>
   </div>
 
   <div style="padding:13px 13px 32px">
-    <button class="sv" style="width:100%;padding:13px;font-size:14px" onclick="saveAll()">💾 Barcha sozlamalarni saqlash</button>
+    <button class="a-sv" style="width:100%;padding:13px;font-size:14px;border-radius:var(--r)" onclick="adminSaveAll()">
+      💾 Barcha sozlamalarni saqlash
+    </button>
   </div>
 </div>
 
-<!-- MAIN TEST -->
-<div id="mainApp" class="screen">
-  <div class="app-header">
-    <div class="hrow">
-      <div class="app-title">📝 Test Varag'i</div>
-      <div class="badge badge-blue" id="codeChip">—</div>
+<!-- ═══ MAIN APP ═══ -->
+<div id="appScreen" class="screen">
+  <!-- Bottom Nav -->
+  <div class="bnav">
+    <div class="bnav-item active" onclick="switchPage('dashPage',this)" id="nav-dash">
+      <div class="bnav-icon">🏠</div>
+      <div class="bnav-lbl">Bosh sahifa</div>
     </div>
-    <div class="chips">
-      <div class="chip">Savollar: <span>45</span></div>
-      <div class="chip">To'ldirilgan: <span id="filledCount">0</span></div>
+    <div class="bnav-item" onclick="switchPage('testsPage',this)" id="nav-tests">
+      <div class="bnav-icon">📝</div>
+      <div class="bnav-lbl">Testlar</div>
+    </div>
+    <div class="bnav-item" onclick="switchPage('histPage',this)" id="nav-hist">
+      <div class="bnav-icon">📊</div>
+      <div class="bnav-lbl">Natijalar</div>
+    </div>
+    <div class="bnav-item" onclick="switchPage('profPage',this)" id="nav-prof">
+      <div class="bnav-icon">👤</div>
+      <div class="bnav-lbl">Profil</div>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div id="dashPage" class="page active">
+    <div class="top-bar">
+      <div>
+        <div class="top-title">Bosh sahifa</div>
+        <div class="top-sub" id="dashDate">—</div>
+      </div>
+      <div class="top-badge" id="dashBadge">—</div>
+    </div>
+    <div class="dash-hero">
+      <div class="hero-greeting">Xush kelibsiz 👋</div>
+      <div class="hero-name" id="heroName">Ishtirokchi</div>
+      <div class="stats-grid" id="dashStats"></div>
+    </div>
+
+    <div id="activTestWrap" style="display:none">
+      <div class="section-title">Faol test</div>
+      <div class="active-test-card" id="activeTestCard" onclick="goActiveTest()">
+        <div class="atc-lbl">Hozir mavjud</div>
+        <div class="atc-code" id="atcCode">—</div>
+        <div class="atc-sub">45 savol · ABCD + ABCDEF + Yozma</div>
+        <div class="atc-arrow">▶ Boshlash →</div>
+      </div>
+    </div>
+
+    <div id="bestBandWrap" style="display:none">
+      <div class="section-title">Eng yaxshi natija</div>
+      <div class="cert-strip" id="bestBand" style="margin:0 16px 20px"></div>
+    </div>
+
+    <div id="recentWrap" style="display:none">
+      <div class="section-title">So'nggi natijalar</div>
+      <div class="result-list" id="recentList"></div>
+    </div>
+  </div>
+
+  <!-- ── TESTS PAGE ── -->
+  <div id="testsPage" class="page">
+    <div class="top-bar">
+      <div>
+        <div class="top-title">Testlar</div>
+        <div class="top-sub">Faol testlar ro'yxati</div>
+      </div>
+    </div>
+    <div class="tests-wrap" id="testsWrap"></div>
+  </div>
+
+  <!-- ── HISTORY PAGE ── -->
+  <div id="histPage" class="page">
+    <div class="top-bar">
+      <div>
+        <div class="top-title">Natijalar tarixi</div>
+        <div class="top-sub">Barcha urinishlar</div>
+      </div>
+    </div>
+    <div class="hist-wrap" id="histWrap"></div>
+  </div>
+
+  <!-- ── PROFILE PAGE ── -->
+  <div id="profPage" class="page">
+    <div class="top-bar">
+      <div class="top-title">Profil</div>
+    </div>
+    <div class="prof-wrap" id="profWrap"></div>
+  </div>
+</div>
+
+<!-- ═══ TEST TAKING ═══ -->
+<div id="testScreen" class="screen">
+  <div class="test-header">
+    <div class="th-row">
+      <div class="th-title" id="testTitle">Test</div>
+      <button class="th-close" onclick="closeTest()">✕ Yopish</button>
+    </div>
+    <div class="th-chips">
+      <div class="th-chip">Savollar: <span>45</span></div>
+      <div class="th-chip">To'ldirilgan: <span id="filled">0</span></div>
     </div>
   </div>
 
   <div class="swrap">
     <div class="shdr">
-      <div class="sdot" style="background:#6c63ff;box-shadow:0 0 8px #6c63ff88"></div>
-      <div class="slbl" style="color:#6c63ff">A / B / C / D</div>
+      <div class="sdot" style="background:#4f8ef7;box-shadow:0 0 8px #4f8ef788"></div>
+      <div class="slbl" style="color:#4f8ef7">A / B / C / D</div>
       <div class="srng">1 – 32</div>
     </div>
-    <div class="agr" id="abcdGrid"></div>
+    <div class="q-grid" id="g1"></div>
   </div>
   <div class="divider"></div>
   <div class="swrap">
     <div class="shdr">
-      <div class="sdot" style="background:#43e97b;box-shadow:0 0 8px #43e97b88"></div>
-      <div class="slbl" style="color:#43e97b">A / B / C / D / E / F</div>
+      <div class="sdot" style="background:#4fd984;box-shadow:0 0 8px #4fd98488"></div>
+      <div class="slbl" style="color:#4fd984">A / B / C / D / E / F</div>
       <div class="srng">33 – 35</div>
     </div>
-    <div class="agr" id="abcdefGrid"></div>
+    <div class="q-grid" id="g2"></div>
   </div>
   <div class="divider"></div>
   <div class="swrap">
     <div class="shdr">
-      <div class="sdot" style="background:#ff6584;box-shadow:0 0 8px #ff658488"></div>
-      <div class="slbl" style="color:#ff6584">Yozma javob</div>
+      <div class="sdot" style="background:#f7614f;box-shadow:0 0 8px #f7614f88"></div>
+      <div class="slbl" style="color:#f7614f">Yozma javob</div>
       <div class="srng">36 – 45</div>
     </div>
-    <div class="wgrid" id="writtenGrid"></div>
+    <div class="w-grid" id="g3"></div>
   </div>
-
   <div class="sub-area">
-    <div class="pbar-wrap"><div class="pbar-fill" id="pbar" style="width:0%"></div></div>
-    <div class="plabel" id="plabel">0 / 45 to'ldirilgan</div>
-    <button class="sub-btn" onclick="submitAnswers()">✅ Natijani ko'rish</button>
+    <div class="p-wrap"><div class="p-fill" id="pFill" style="width:0%"></div></div>
+    <div class="p-lbl" id="pLbl">0 / 45 to'ldirilgan</div>
+    <button class="sub-btn" onclick="submitTest()">✅ Natijani ko'rish</button>
   </div>
 </div>
 
-<!-- RESULT -->
-<div id="resultScreen" class="screen">
-  <div class="rcard">
-    <div class="grade-wrap">
-      <div class="grade-circle" id="gradeCircle">—</div>
-      <div class="grade-label" id="gradeLabel">—</div>
+<!-- ═══ RESULT DETAIL ═══ -->
+<div id="resultDetailScreen" class="screen">
+  <div class="top-bar">
+    <div class="top-title">Natija</div>
+    <button class="at-back" onclick="backFromResult()">← Orqaga</button>
+  </div>
+  <div class="res-hero">
+    <div class="res-grade-wrap">
+      <div class="res-grade-ring" id="rGradeRing">—</div>
+      <div class="res-grade-name" id="rGradeName">—</div>
     </div>
+    <div class="res-score-big" id="rScore">0</div>
+    <div class="res-score-sub" id="rScoreSub">ball</div>
+  </div>
 
-    <div class="theta-row">
-      <div class="theta-icon">🧠</div>
-      <div class="theta-info">
-        <div class="theta-title">Rasch θ (Theta) — Qobiliyat darajasi</div>
-        <div class="theta-val" id="thetaVal">—</div>
-        <div class="theta-desc" id="thetaDesc">—</div>
-      </div>
+  <div class="theta-card">
+    <div class="theta-ic">🧠</div>
+    <div>
+      <div class="theta-lbl">Rasch θ · Qobiliyat darajasi</div>
+      <div class="theta-val" id="rTheta">—</div>
+      <div class="theta-desc" id="rThetaDesc">—</div>
     </div>
+  </div>
 
-    <div class="score-big" id="scorePct">0</div>
-    <div class="score-sub" id="scoreSub">ball</div>
+  <div class="res-stats">
+    <div class="rs-box rs-c"><div class="rs-num" id="rC">0</div><div class="rs-lbl">✅ To'g'ri</div></div>
+    <div class="rs-box rs-w"><div class="rs-num" id="rW">0</div><div class="rs-lbl">❌ Noto'g'ri</div></div>
+    <div class="rs-box rs-e"><div class="rs-num" id="rE">0</div><div class="rs-lbl">⬜ Bo'sh</div></div>
+  </div>
 
-    <div class="stats-row">
-      <div class="sbox sc"><div class="snum" id="stC">0</div><div class="slbl">✅ To'g'ri</div></div>
-      <div class="sbox sw"><div class="snum" id="stW">0</div><div class="slbl">❌ Noto'g'ri</div></div>
-      <div class="sbox se"><div class="snum" id="stE">0</div><div class="slbl">⬜ Bo'sh</div></div>
+  <div class="breakdown">
+    <div class="bk-ttl">Bo'limlar bo'yicha</div>
+    <div class="bk-row">
+      <div class="bk-lbl">1–32 (ABCD)</div>
+      <div class="bk-bw"><div class="bk-bf" id="bk1" style="background:#4f8ef7;width:0%"></div></div>
+      <div class="bk-pct" id="bk1p" style="color:#4f8ef7">0%</div>
     </div>
-
-    <div class="breakdown">
-      <div class="bk-title">Bo'limlar bo'yicha</div>
-      <div class="bk-row">
-        <div class="bk-lbl">1–32 (ABCD)</div>
-        <div class="bk-bar-wrap"><div class="bk-bar" id="bk1" style="background:#6c63ff;width:0%"></div></div>
-        <div class="bk-pct" id="bk1p" style="color:#6c63ff">0%</div>
-      </div>
-      <div class="bk-row">
-        <div class="bk-lbl">33–35 (ABCDEF)</div>
-        <div class="bk-bar-wrap"><div class="bk-bar" id="bk2" style="background:#43e97b;width:0%"></div></div>
-        <div class="bk-pct" id="bk2p" style="color:#43e97b">0%</div>
-      </div>
-      <div class="bk-row">
-        <div class="bk-lbl">36–45 (Yozma)</div>
-        <div class="bk-bar-wrap"><div class="bk-bar" id="bk3" style="background:#ff6584;width:0%"></div></div>
-        <div class="bk-pct" id="bk3p" style="color:#ff6584">0%</div>
-      </div>
+    <div class="bk-row">
+      <div class="bk-lbl">33–35 (ABCDEF)</div>
+      <div class="bk-bw"><div class="bk-bf" id="bk2" style="background:#4fd984;width:0%"></div></div>
+      <div class="bk-pct" id="bk2p" style="color:#4fd984">0%</div>
     </div>
-
-    <div class="cert-band" id="certBand">
-      <div class="cert-title" id="certTitle">—</div>
-      <div class="cert-desc" id="certDesc">—</div>
+    <div class="bk-row">
+      <div class="bk-lbl">36–45 (Yozma)</div>
+      <div class="bk-bw"><div class="bk-bf" id="bk3" style="background:#f7614f;width:0%"></div></div>
+      <div class="bk-pct" id="bk3p" style="color:#f7614f">0%</div>
     </div>
+  </div>
 
-    <button class="det-btn" onclick="showDetail()">📊 Batafsil ko'rish (javoblar)</button>
+  <div class="cert-card" id="rCertCard">
+    <div class="cc-badge" id="rCertIcon">🏅</div>
+    <div class="cc-title" id="rCertTitle">—</div>
+    <div class="cc-sub" id="rCertSub">—</div>
+  </div>
+
+  <div class="res-actions">
+    <button class="det-btn" onclick="showAnswerDetail()">📋 Javoblarni ko'rish</button>
     <button class="retry-btn" onclick="retryTest()">🔄 Qayta urinish</button>
+    <button class="det-btn" onclick="backFromResult()" style="margin-top:4px">← Bosh sahifaga qaytish</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
 <script>
+// ──────────────────────────────────────────
+// CONSTANTS & CONFIG
+// ──────────────────────────────────────────
+const ADMIN_PASSWORD = 'admin123'; // ← o'zgartiring
+
+// Daraja shkalasi (100 ballik)
+const BANDS = [
+  { min:70, grade:'A+', color:'#4fd984', bg:'#4fd98415', cert:'Oltin sertifikat 🥇',   icon:'🥇', lbl:'Mukammal' },
+  { min:65, grade:'A',  color:'#4fd984', bg:'#4fd98415', cert:'Oltin sertifikat 🥇',   icon:'🥇', lbl:"A'lo" },
+  { min:60, grade:'B+', color:'#4f8ef7', bg:'#4f8ef715', cert:'Kumush sertifikat 🥈',  icon:'🥈', lbl:'Yaxshi+' },
+  { min:54, grade:'B',  color:'#4f8ef7', bg:'#4f8ef715', cert:'Kumush sertifikat 🥈',  icon:'🥈', lbl:'Yaxshi' },
+  { min:50, grade:'C+', color:'#f7c44f', bg:'#f7c44f15', cert:'Bronza sertifikat 🥉',  icon:'🥉', lbl:'Qoniqarli+' },
+  { min:46, grade:'C',  color:'#f7c44f', bg:'#f7c44f15', cert:'Bronza sertifikat 🥉',  icon:'🥉', lbl:'Qoniqarli' },
+  { min:0,  grade:'F',  color:'#f7614f', bg:'#f7614f15', cert:'Sertifikat berilmaydi', icon:'❌', lbl:'Qoniqarsiz' },
+];
+
+// Ballash tizimi (milliy sertifikat)
+// 1-32: 1 ball, 33-35: 2 ball, 36-45 a+b: 0.7+0.7=1.4 ball per q
+const RAW_MAX = 32 + 6 + 14; // 52
+
+// ──────────────────────────────────────────
+// PERSISTENT STORAGE (shared across users)
+// ──────────────────────────────────────────
+const ADMIN_KEY    = 'adminConfig';    // shared: test config set by admin
+const RESULTS_KEY  = 'allResults';     // shared: all user results
+const PROFILE_KEY  = 'userProfile';    // personal: per-user profile
+
+async function storageGet(key, shared=false){
+  try{
+    const r=await window.storage.get(key,shared);
+    return r?JSON.parse(r.value):null;
+  }catch{return null;}
+}
+async function storageSet(key,val,shared=false){
+  try{await window.storage.set(key,JSON.stringify(val),shared);}catch{}
+}
+
+// ──────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────
 const tg = window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
 
-// ═══════════════════════════════
-//  CONFIG
-// ═══════════════════════════════
-const ADMIN_PASSWORD = 'admin123'; // ← parolni shu yerda o'zgartiring
+let adminConfig = { testCode:'', answers:{}, diff:{} };
+let allResults  = []; // [{id,userId,userName,code,date,scaled,raw,theta,grade,correct,wrong,empty,c1,c2,c3}]
+let userProfile = { name:'Ishtirokchi', userId:'', attempts:0 };
+let userAnswers = {};
+let currentResult = null;
+let fromDetail = false;
 
-// Milliy sertifikat daraja shkalasi (ball asosida)
-// Ball = to'g'ri javoblar soni (max 45 ta savol uchun)
-// Lekin siz 100 ballik tizimda ko'rsatishni xohlagan bo'lsangiz,
-// quyidagi SCORE_SCALE ni 'raw' (to'g'ri soni) yoki 'scaled' (100lik) ga o'zgartiring
-const SCORE_SCALE = 'scaled'; // 'raw' yoki 'scaled'
+// ──────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────
+async function init(){
+  // Load shared admin config
+  const ac = await storageGet(ADMIN_KEY, true);
+  if(ac) adminConfig = ac;
 
-const GRADE_BANDS = [
-  { min:70, grade:'A+', color:'#43e97b', bg:'#43e97b15', label:'Mukammal', cert:'Oltin sertifikat' },
-  { min:65, grade:'A',  color:'#43e97b', bg:'#43e97b15', label:'A\'lo',    cert:'Oltin sertifikat' },
-  { min:60, grade:'B+', color:'#60a5fa', bg:'#60a5fa15', label:'Yaxshi+',  cert:'Kumush sertifikat' },
-  { min:54, grade:'B',  color:'#60a5fa', bg:'#60a5fa15', label:'Yaxshi',   cert:'Kumush sertifikat' },
-  { min:50, grade:'C+', color:'#fbbf24', bg:'#fbbf2415', label:'Qoniqarli+', cert:'Bronza sertifikat' },
-  { min:46, grade:'C',  color:'#fbbf24', bg:'#fbbf2415', label:'Qoniqarli', cert:'Bronza sertifikat' },
-  { min:0,  grade:'F',  color:'#ff6584', bg:'#ff658415', label:'Qoniqarsiz', cert:'Sertifikat berilmaydi' },
-];
+  // Load all results (shared)
+  const ar = await storageGet(RESULTS_KEY, true);
+  if(ar) allResults = ar;
 
-// ═══════════════════════════════
-//  STORAGE
-// ═══════════════════════════════
-function loadData(){try{return JSON.parse(localStorage.getItem('tdata')||'{}');}catch{return{};}}
-function saveData(d){localStorage.setItem('tdata',JSON.stringify(d));}
-let data=loadData();
-if(!data.testCode) data.testCode='';
-if(!data.answers)  data.answers={};
-if(!data.diff)     data.diff={};   // difficulty per question
+  // Load personal profile
+  const up = await storageGet(PROFILE_KEY, false);
+  if(up) userProfile = up;
 
-// ═══════════════════════════════
-//  RASCH MODEL
-// ═══════════════════════════════
-// Simplified Rasch: estimate theta using MLE-like iteration
-// P(correct | theta, b) = e^(theta-b) / (1 + e^(theta-b))
-function raschP(theta, b){ const e=Math.exp(theta-b); return e/(1+e); }
-
-function estimateTheta(responseVector, bValues){
-  // responseVector: array of 0/1, bValues: array of b params
-  let theta = 0;
-  for(let iter=0; iter<50; iter++){
-    let num=0, den=0;
-    for(let j=0;j<responseVector.length;j++){
-      const p = raschP(theta, bValues[j]);
-      num += responseVector[j] - p;
-      den += p*(1-p);
-    }
-    if(den===0) break;
-    const delta = num/den;
-    theta += delta;
-    if(Math.abs(delta)<0.001) break;
-    theta = Math.max(-4, Math.min(4, theta));
+  // Get Telegram user info
+  if(tg?.initDataUnsafe?.user){
+    const u = tg.initDataUnsafe.user;
+    userProfile.userId   = String(u.id||'');
+    userProfile.name     = u.first_name + (u.last_name?' '+u.last_name:'');
+    await storageSet(PROFILE_KEY, userProfile, false);
   }
-  return Math.round(theta*100)/100;
 }
 
-function thetaDescription(theta){
-  if(theta>=2)   return 'Juda yuqori qobiliyat darajasi';
-  if(theta>=1)   return 'Yuqori qobiliyat darajasi';
-  if(theta>=0)   return 'O\'rtadan yuqori daraja';
-  if(theta>=-1)  return 'O\'rtacha daraja';
-  if(theta>=-2)  return 'Qoniqarli daraja';
-  return           'Past daraja — ko\'proq mashq kerak';
-}
+init();
 
-// ═══════════════════════════════
-//  SCORING
-// ═══════════════════════════════
-// Milliy sertifikat ballash:
-// 1-32: har biri 1 ball (max 32)
-// 33-35: har biri 2 ball (max 6)  [3 savol × 2]
-// 36-45: har biri 0.7+0.7=1.4 ball (max 14) → rounded to max ~14
-// Total raw max ≈ 52, scaled to 100
-const RAW_MAX = 32 + 6 + 14; // = 52
-
-function rawToScaled(raw){ return Math.round((raw/RAW_MAX)*100); }
-
-function getGrade(scaledScore){
-  for(const band of GRADE_BANDS){
-    if(scaledScore>=band.min) return band;
-  }
-  return GRADE_BANDS[GRADE_BANDS.length-1];
-}
-
-// ═══════════════════════════════
-//  SCREENS
-// ═══════════════════════════════
+// ──────────────────────────────────────────
+// SCREEN NAV
+// ──────────────────────────────────────────
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// ═══════════════════════════════
-//  HOME
-// ═══════════════════════════════
-function startTest(){
-  const code=document.getElementById('codeInput').value.trim();
-  if(!code){showErr('codeErr','Iltimos kodni kiriting!');return;}
-  if(data.testCode && code!==data.testCode){showErr('codeErr','❌ Noto\'g\'ri kod!');return;}
-  document.getElementById('codeErr').style.display='none';
-  document.getElementById('codeChip').textContent='🔑 '+code;
-  buildTestApp();
-  showScreen('mainApp');
+function switchPage(pageId, navEl){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  navEl.classList.add('active');
+  if(pageId==='dashPage')  renderDashboard();
+  if(pageId==='testsPage') renderTests();
+  if(pageId==='histPage')  renderHistory();
+  if(pageId==='profPage')  renderProfile();
 }
-document.getElementById('codeInput').addEventListener('keydown',e=>{if(e.key==='Enter')startTest();});
 
-// ═══════════════════════════════
-//  ADMIN
-// ═══════════════════════════════
+async function enterApp(){
+  showScreen('appScreen');
+  renderDashboard();
+  renderTests();
+  renderHistory();
+  renderProfile();
+}
+
+// ──────────────────────────────────────────
+// ADMIN
+// ──────────────────────────────────────────
 function checkAdmin(){
-  if(document.getElementById('adminPass').value!==ADMIN_PASSWORD){showErr('adminErr','❌ Noto\'g\'ri parol!');return;}
+  if(document.getElementById('adminPass').value!==ADMIN_PASSWORD){
+    showErr('adminErr','❌ Noto\'g\'ri parol!');return;
+  }
   document.getElementById('adminErr').style.display='none';
   document.getElementById('adminPass').value='';
   buildAdminPanel();
@@ -483,310 +689,675 @@ function checkAdmin(){
 document.getElementById('adminPass').addEventListener('keydown',e=>{if(e.key==='Enter')checkAdmin();});
 
 function buildAdminPanel(){
-  document.getElementById('adminCode').value=data.testCode||'';
-  document.getElementById('curCode').textContent=data.testCode||'(belgilanmagan)';
+  document.getElementById('adminCode').value = adminConfig.testCode||'';
+  document.getElementById('curCode').textContent = adminConfig.testCode||'(yo\'q)';
 
-  // Difficulty grid (all 35 MC questions)
-  const dg=document.getElementById('diffGrid');
+  // Difficulty grid
+  const dg = document.getElementById('diffGrid');
   dg.innerHTML='';
   for(let i=1;i<=35;i++){
-    const wrap=document.createElement('div');
-    wrap.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:6px 8px;';
-    wrap.innerHTML=`<div style="font-size:10px;color:var(--muted);font-weight:700;margin-bottom:3px">${i}-savol b</div>
-      <input class="diff-input" id="diff-${i}" type="number" step="0.1" min="-3" max="3" value="${data.diff[i]!==undefined?data.diff[i]:0}" placeholder="0.0"/>`;
-    dg.appendChild(wrap);
+    const c=document.createElement('div');
+    c.className='diff-cell';
+    c.innerHTML=`<div class="diff-num">${i}</div>
+      <input class="diff-val" id="dv-${i}" type="number" step="0.1" min="-3" max="3"
+        value="${adminConfig.diff[i]!==undefined?adminConfig.diff[i]:0}"/>`;
+    dg.appendChild(c);
   }
 
   // Answer grids
-  buildAdminAnswerGrid('adminGrid1',1,32,['A','B','C','D']);
-  buildAdminAnswerGrid('adminGrid2',33,35,['A','B','C','D','E','F']);
-  buildAdminWritten();
+  buildAGrid('aGrid1',1,32,['A','B','C','D']);
+  buildAGrid('aGrid2',33,35,['A','B','C','D','E','F']);
+  buildAWritten();
 }
 
-function buildAdminAnswerGrid(gridId,from,to,opts){
-  const grid=document.getElementById(gridId);
-  grid.innerHTML='';
+function buildAGrid(gridId,from,to,opts){
+  const g=document.getElementById(gridId); g.innerHTML='';
   for(let i=from;i<=to;i++){
-    const row=document.createElement('div');
-    row.className='arow';
-    row.innerHTML=`<div class="anum">${i}</div><div class="aopts" id="aopts-${i}"></div>`;
-    grid.appendChild(row);
-    const or=row.querySelector('.aopts');
+    const row=document.createElement('div'); row.className='a-row';
+    row.innerHTML=`<div class="a-num">${i}</div><div class="a-opts" id="ao-${i}"></div>`;
+    g.appendChild(row);
+    const or=row.querySelector('.a-opts');
     opts.forEach(o=>{
-      const btn=document.createElement('button');
-      btn.className='ab'+(data.answers[i]===o?` sel-${o}`:'');
-      btn.textContent=o;
-      btn.onclick=()=>{or.querySelectorAll('.ab').forEach(b=>b.className='ab');btn.classList.add(`sel-${o}`);data.answers[i]=o;};
-      or.appendChild(btn);
+      const b=document.createElement('button');
+      b.className='a-ob'+(adminConfig.answers[i]===o?` sel-${o}`:'');
+      b.textContent=o;
+      b.onclick=()=>{or.querySelectorAll('.a-ob').forEach(x=>x.className='a-ob');b.classList.add(`sel-${o}`);adminConfig.answers[i]=o;};
+      or.appendChild(b);
     });
   }
 }
 
-function buildAdminWritten(){
-  const g=document.getElementById('adminWritten');
-  g.innerHTML='';
+function buildAWritten(){
+  const g=document.getElementById('aWritten'); g.innerHTML='';
   for(let i=36;i<=45;i++){
-    const d2=document.createElement('div');
-    d2.className='wkrow';
-    d2.innerHTML=`<div class="wklbl">${i}-savol kalit so'zlari</div>
-      <div class="wkparts">
-        <div class="wkp"><div class="wklbl">a)</div><textarea class="wki" id="wk-${i}-a" rows="2">${data.answers[`${i}-a`]||''}</textarea></div>
-        <div class="wkp"><div class="wklbl">b)</div><textarea class="wki" id="wk-${i}-b" rows="2">${data.answers[`${i}-b`]||''}</textarea></div>
+    const d=document.createElement('div'); d.className='wk-row';
+    d.innerHTML=`<div class="wk-lbl">${i}-savol kalit so'zlari</div>
+      <div class="wk-parts">
+        <div class="wk-p"><div class="wk-lbl">a)</div><textarea class="wk-i" id="wk-${i}-a" rows="2">${adminConfig.answers[`${i}-a`]||''}</textarea></div>
+        <div class="wk-p"><div class="wk-lbl">b)</div><textarea class="wk-i" id="wk-${i}-b" rows="2">${adminConfig.answers[`${i}-b`]||''}</textarea></div>
       </div>`;
-    g.appendChild(d2);
+    g.appendChild(d);
   }
 }
 
-function saveCode(){
-  data.testCode=document.getElementById('adminCode').value.trim();
-  saveData(data);
-  document.getElementById('curCode').textContent=data.testCode||'(belgilanmagan)';
+async function adminSaveCode(){
+  adminConfig.testCode = document.getElementById('adminCode').value.trim();
+  await storageSet(ADMIN_KEY, adminConfig, true);
+  document.getElementById('curCode').textContent = adminConfig.testCode||'(yo\'q)';
   showToast('✅ Kod saqlandi!');
 }
 
-function saveAll(){
-  data.testCode=document.getElementById('adminCode').value.trim();
-  // save difficulties
+async function adminSaveAll(){
+  adminConfig.testCode = document.getElementById('adminCode').value.trim();
   for(let i=1;i<=35;i++){
-    const el=document.getElementById(`diff-${i}`);
-    if(el) data.diff[i]=parseFloat(el.value)||0;
+    const el=document.getElementById(`dv-${i}`);
+    if(el) adminConfig.diff[i]=parseFloat(el.value)||0;
   }
-  // save written keys
   for(let i=36;i<=45;i++){
     ['a','b'].forEach(p=>{
       const el=document.getElementById(`wk-${i}-${p}`);
-      if(el) data.answers[`${i}-${p}`]=el.value.trim();
+      if(el) adminConfig.answers[`${i}-${p}`]=el.value.trim();
     });
   }
-  saveData(data);
-  document.getElementById('curCode').textContent=data.testCode||'(belgilanmagan)';
+  await storageSet(ADMIN_KEY, adminConfig, true);
+  document.getElementById('curCode').textContent = adminConfig.testCode||'(yo\'q)';
   showToast('✅ Barcha sozlamalar saqlandi!');
 }
 
-// ═══════════════════════════════
-//  BUILD TEST
-// ═══════════════════════════════
-const userAnswers={};
-const TOTAL=45;
+// ──────────────────────────────────────────
+// START TEST FROM SPLASH
+// ──────────────────────────────────────────
+async function startTest(){
+  // Reload admin config from shared storage
+  const ac = await storageGet(ADMIN_KEY, true);
+  if(ac) adminConfig = ac;
 
-function buildTestApp(){
-  ['abcdGrid','abcdefGrid','writtenGrid'].forEach(id=>document.getElementById(id).innerHTML='');
-  Object.keys(userAnswers).forEach(k=>delete userAnswers[k]);
-  for(let i=1;i<=32;i++) addOptRow(i,['A','B','C','D'],'abcdGrid');
-  for(let i=33;i<=35;i++) addOptRow(i,['A','B','C','D','E','F'],'abcdefGrid');
-  for(let i=36;i<=45;i++) addWrittenRow(i);
-  updateProgress();
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  if(!code){ showErr('codeErr','Kodni kiriting!'); return; }
+  if(adminConfig.testCode && code!==adminConfig.testCode.toUpperCase()){
+    showErr('codeErr','❌ Noto\'g\'ri kod!'); return;
+  }
+  document.getElementById('codeErr').style.display='none';
+  openTest(code);
+}
+document.getElementById('codeInput').addEventListener('keydown',e=>{if(e.key==='Enter')startTest();});
+
+function goActiveTest(){
+  const code = adminConfig.testCode||'TEST';
+  openTest(code);
 }
 
-function addOptRow(i,opts,gridId){
-  const grid=document.getElementById(gridId);
-  const row=document.createElement('div');
-  row.className='urow';
-  row.innerHTML=`<div class="qn">${i}</div><div class="optsr" id="opts-${i}"></div>`;
-  grid.appendChild(row);
-  const or=row.querySelector('.optsr');
+function openTest(code){
+  document.getElementById('testTitle').textContent = '📝 '+code;
+  buildTestUI();
+  showScreen('testScreen');
+  document.getElementById('testScreen').scrollTop=0;
+}
+
+function closeTest(){
+  showScreen('appScreen');
+  renderDashboard();
+}
+
+// ──────────────────────────────────────────
+// TEST UI
+// ──────────────────────────────────────────
+function buildTestUI(){
+  ['g1','g2','g3'].forEach(id=>document.getElementById(id).innerHTML='');
+  Object.keys(userAnswers).forEach(k=>delete userAnswers[k]);
+
+  for(let i=1;i<=32;i++) addQRow(i,['A','B','C','D'],'g1');
+  for(let i=33;i<=35;i++) addQRow(i,['A','B','C','D','E','F'],'g2');
+  for(let i=36;i<=45;i++) addWRow(i);
+  updateProg();
+}
+
+function addQRow(i,opts,gid){
+  const g=document.getElementById(gid);
+  const row=document.createElement('div'); row.className='q-row';
+  row.innerHTML=`<div class="qn">${i}</div><div class="opts" id="opts-${i}"></div>`;
+  g.appendChild(row);
+  const or=row.querySelector('.opts');
   opts.forEach(o=>{
-    const btn=document.createElement('button');
-    btn.className='ob';btn.textContent=o;btn.id=`ubtn-${i}-${o}`;
-    btn.onclick=()=>{or.querySelectorAll('.ob').forEach(b=>b.className='ob');btn.classList.add(`sel-${o}`);userAnswers[i]=o;updateProgress();};
-    or.appendChild(btn);
+    const b=document.createElement('button');
+    b.className='ob'; b.textContent=o; b.id=`ub-${i}-${o}`;
+    b.onclick=()=>{or.querySelectorAll('.ob').forEach(x=>x.className='ob');b.classList.add(`sel-${o}`);userAnswers[i]=o;updateProg();};
+    or.appendChild(b);
   });
 }
 
-function addWrittenRow(i){
-  const grid=document.getElementById('writtenGrid');
-  const row=document.createElement('div');
-  row.className='wrow';
-  row.innerHTML=`<div class="wnum">${i}-savol</div>
-    <div class="wparts">
-      <div class="wpart"><div class="plbl">a)</div><textarea class="wi" id="w-${i}-a" rows="2" placeholder="a javob..."></textarea><div class="ahint" id="hint-${i}-a"></div></div>
-      <div class="wpart"><div class="plbl">b)</div><textarea class="wi" id="w-${i}-b" rows="2" placeholder="b javob..."></textarea><div class="ahint" id="hint-${i}-b"></div></div>
+function addWRow(i){
+  const g=document.getElementById('g3');
+  const row=document.createElement('div'); row.className='w-row';
+  row.innerHTML=`<div class="w-num">${i}-savol</div>
+    <div class="w-parts">
+      <div class="w-part"><div class="w-plbl">a)</div><textarea class="w-inp" id="w-${i}-a" rows="2" placeholder="a javob..."></textarea><div class="w-hint" id="wh-${i}-a"></div></div>
+      <div class="w-part"><div class="w-plbl">b)</div><textarea class="w-inp" id="w-${i}-b" rows="2" placeholder="b javob..."></textarea><div class="w-hint" id="wh-${i}-b"></div></div>
     </div>`;
-  grid.appendChild(row);
+  g.appendChild(row);
   ['a','b'].forEach(p=>{
     const ta=row.querySelector(`#w-${i}-${p}`);
-    ta.addEventListener('input',()=>{userAnswers[`${i}-${p}`]=ta.value.trim();updateProgress();});
+    ta.addEventListener('input',()=>{userAnswers[`${i}-${p}`]=ta.value.trim();updateProg();});
   });
 }
 
-function updateProgress(){
+function updateProg(){
   let f=0;
   for(let i=1;i<=35;i++) if(userAnswers[i]) f++;
   for(let i=36;i<=45;i++) if(userAnswers[`${i}-a`]||userAnswers[`${i}-b`]) f++;
-  const pct=Math.round((f/TOTAL)*100);
-  document.getElementById('pbar').style.width=pct+'%';
-  document.getElementById('plabel').textContent=`${f} / ${TOTAL} to'ldirilgan`;
-  document.getElementById('filledCount').textContent=f;
+  document.getElementById('pFill').style.width=(f/45*100)+'%';
+  document.getElementById('pLbl').textContent=`${f} / 45 to'ldirilgan`;
+  document.getElementById('filled').textContent=f;
 }
 
-// ═══════════════════════════════
-//  SUBMIT & GRADE
-// ═══════════════════════════════
-function submitAnswers(){
-  const ans=data.answers;
-  let correct=0,wrong=0,empty=0;
-  let raw=0;
+// ──────────────────────────────────────────
+// RASCH MODEL — to'g'ri versiya
+// ──────────────────────────────────────────
+// P(x=1|theta,b) = 1 / (1 + exp(-(theta-b)))
+function raschP(theta,b){ return 1/(1+Math.exp(-(theta-b))); }
 
-  // For Rasch: collect response vector and b values for MC (1-35)
-  const responseVec=[];
-  const bValues=[];
+// Newton-Raphson MLE theta estimation
+// responseVec: array of 0/1 (aligned with bVals)
+function estimateTheta(responseVec, bVals){
+  const n = responseVec.length;
+  const sumR = responseVec.reduce((a,b)=>a+b,0);
 
-  let c1=0,c2=0,c3=0; // section correct counts
+  // Edge cases: perfect score or zero score
+  if(sumR===n) return 3.0;
+  if(sumR===0) return -3.0;
 
-  // ── Section 1: 1-32 (1 ball each) ──
+  let theta = 0;
+  for(let iter=0;iter<100;iter++){
+    let grad=0, hess=0;
+    for(let j=0;j<n;j++){
+      const p = raschP(theta, bVals[j]);
+      grad += responseVec[j] - p;          // first derivative
+      hess -= p*(1-p);                     // second derivative (negative)
+    }
+    if(Math.abs(hess)<1e-9) break;
+    const delta = -grad/hess;              // Newton step
+    theta += delta;
+    theta = Math.max(-4, Math.min(4, theta));
+    if(Math.abs(delta)<0.0001) break;
+  }
+  return Math.round(theta*100)/100;
+}
+
+function thetaDesc(t){
+  if(t>=2)   return 'Juda yuqori qobiliyat — top 5%';
+  if(t>=1)   return 'Yuqori qobiliyat darajasi';
+  if(t>=0.5) return "O'rtadan ancha yuqori";
+  if(t>=0)   return "O'rtacha daraja";
+  if(t>=-0.5)return "O'rtadan biroz past";
+  if(t>=-1)  return "O'rtacha past daraja";
+  if(t>=-2)  return "Qoniqarli, mashq kerak";
+  return       "Past daraja — ko'proq tayyorlanish kerak";
+}
+
+function getBand(score){
+  for(const b of BANDS) if(score>=b.min) return b;
+  return BANDS[BANDS.length-1];
+}
+
+// ──────────────────────────────────────────
+// SUBMIT & SCORE
+// ──────────────────────────────────────────
+async function submitTest(){
+  const ans = adminConfig.answers;
+  const diff = adminConfig.diff;
+
+  let correct=0, wrong=0, empty=0;
+  let raw=0, c1=0, c2=0, c3=0;
+  const respVec=[], bVec=[];
+
+  // 1-32: 1 ball each
   for(let i=1;i<=32;i++){
     const u=userAnswers[i]||'';
     const c=ans[i]||'';
-    const b=data.diff[i]!==undefined?data.diff[i]:0;
+    const b=diff[i]!==undefined?Number(diff[i]):0;
     const or=document.getElementById(`opts-${i}`);
-    if(or) or.querySelectorAll('.ob').forEach(b2=>b2.className='ob');
+    if(or) or.querySelectorAll('.ob').forEach(x=>x.className='ob');
 
-    let res=0;
-    if(!c){ if(u){correct++;raw+=1;c1++;res=1;} else empty++; }
+    let r=0;
+    if(!c){ if(u){correct++;raw+=1;c1++;r=1;} else empty++; }
     else if(!u){
       empty++;
-      const mb=document.getElementById(`ubtn-${i}-${c}`);
-      if(mb) mb.classList.add('missed');
+      const m=document.getElementById(`ub-${i}-${c}`);
+      if(m)m.classList.add('missed');
     } else if(u===c){
-      correct++;raw+=1;c1++;res=1;
-      const mb=document.getElementById(`ubtn-${i}-${u}`);
-      if(mb) mb.classList.add('correct');
+      correct++;raw+=1;c1++;r=1;
+      const m=document.getElementById(`ub-${i}-${u}`);
+      if(m)m.classList.add('correct');
     } else {
       wrong++;
-      const wb=document.getElementById(`ubtn-${i}-${u}`);
-      if(wb) wb.classList.add('wrong');
-      const mb=document.getElementById(`ubtn-${i}-${c}`);
-      if(mb) mb.classList.add('missed');
+      const w=document.getElementById(`ub-${i}-${u}`);
+      if(w)w.classList.add('wrong');
+      const m=document.getElementById(`ub-${i}-${c}`);
+      if(m)m.classList.add('missed');
     }
-    responseVec.push(res); bValues.push(b);
+    respVec.push(r); bVec.push(b);
   }
 
-  // ── Section 2: 33-35 (2 ball each) ──
+  // 33-35: 2 ball each
   for(let i=33;i<=35;i++){
     const u=userAnswers[i]||'';
     const c=ans[i]||'';
-    const b=data.diff[i]!==undefined?data.diff[i]:0;
+    const b=diff[i]!==undefined?Number(diff[i]):0;
     const or=document.getElementById(`opts-${i}`);
-    if(or) or.querySelectorAll('.ob').forEach(b2=>b2.className='ob');
+    if(or) or.querySelectorAll('.ob').forEach(x=>x.className='ob');
 
-    let res=0;
-    if(!c){ if(u){correct++;raw+=2;c2++;res=1;} else empty++; }
+    let r=0;
+    if(!c){ if(u){correct++;raw+=2;c2++;r=1;} else empty++; }
     else if(!u){
       empty++;
-      const mb=document.getElementById(`ubtn-${i}-${c}`);
-      if(mb) mb.classList.add('missed');
+      const m=document.getElementById(`ub-${i}-${c}`);
+      if(m)m.classList.add('missed');
     } else if(u===c){
-      correct++;raw+=2;c2++;res=1;
-      const mb=document.getElementById(`ubtn-${i}-${u}`);
-      if(mb) mb.classList.add('correct');
+      correct++;raw+=2;c2++;r=1;
+      const m=document.getElementById(`ub-${i}-${u}`);
+      if(m)m.classList.add('correct');
     } else {
       wrong++;
-      const wb=document.getElementById(`ubtn-${i}-${u}`);
-      if(wb) wb.classList.add('wrong');
-      const mb=document.getElementById(`ubtn-${i}-${c}`);
-      if(mb) mb.classList.add('missed');
+      const w=document.getElementById(`ub-${i}-${u}`);
+      if(w)w.classList.add('wrong');
+      const m=document.getElementById(`ub-${i}-${c}`);
+      if(m)m.classList.add('missed');
     }
-    responseVec.push(res); bValues.push(b);
+    respVec.push(r); bVec.push(b);
   }
 
-  // ── Section 3: 36-45 (0.7 ball per sub-part) ──
+  // 36-45: 0.7 per sub-part (key word matching)
   for(let i=36;i<=45;i++){
     ['a','b'].forEach(p=>{
       const u=(userAnswers[`${i}-${p}`]||'').toLowerCase().trim();
       const c=(ans[`${i}-${p}`]||'').toLowerCase().trim();
       const ta=document.getElementById(`w-${i}-${p}`);
-      const hint=document.getElementById(`hint-${i}-${p}`);
+      const h=document.getElementById(`wh-${i}-${p}`);
       if(!ta) return;
       ta.readOnly=true;
       if(!c){ if(u){correct++;raw+=0.7;c3++;} else empty++; }
       else if(!u){
         empty++;
-        ta.classList.add('wrong-i');
-        hint.textContent='✅ To\'g\'ri: '+ans[`${i}-${p}`];
-        hint.style.display='block';
+        ta.classList.add('wi');
+        h.textContent='✅ To\'g\'ri: '+ans[`${i}-${p}`];
+        h.style.display='block';
       } else if(u.includes(c)||c.includes(u)){
         correct++;raw+=0.7;c3++;
-        ta.classList.add('correct-i');
+        ta.classList.add('ci');
       } else {
         wrong++;
-        ta.classList.add('wrong-i');
-        hint.textContent='✅ To\'g\'ri: '+ans[`${i}-${p}`];
-        hint.style.display='block';
+        ta.classList.add('wi');
+        h.textContent='✅ To\'g\'ri: '+ans[`${i}-${p}`];
+        h.style.display='block';
       }
     });
   }
 
-  // ── Scaled score ──
-  const scaled = rawToScaled(raw);
+  // Scale to 100
+  const scaled = Math.round((raw/RAW_MAX)*100);
 
-  // ── Rasch theta ──
-  const theta = estimateTheta(responseVec, bValues);
+  // Rasch theta
+  const theta = estimateTheta(respVec, bVec);
 
-  // ── Grade ──
-  const band = getGrade(scaled);
+  // Grade
+  const band = getBand(scaled);
 
-  // ── Section percentages ──
-  const pct1=Math.round((c1/32)*100);
-  const pct2=c2>0?Math.round((c2/3)*100):0;
-  const totalW3=20; // 10 savol × 2 qism
-  const pct3=Math.round((c3/totalW3)*100);
+  // Section percentages
+  const p1=Math.round((c1/32)*100);
+  const p2=c2>0?Math.round((c2/3)*100):0;
+  const p3=Math.round((c3/20)*100);
 
-  // ── Fill result screen ──
-  const gc=document.getElementById('gradeCircle');
+  // Build result object
+  const code = document.getElementById('testTitle').textContent.replace('📝 ','');
+  const resultObj = {
+    id: Date.now(),
+    userId: userProfile.userId||'anon',
+    userName: userProfile.name||'Ishtirokchi',
+    code, date: new Date().toLocaleDateString('uz-UZ'),
+    scaled, raw:Math.round(raw*10)/10,
+    theta, grade:band.grade,
+    correct, wrong, empty,
+    c1, c2, c3, p1, p2, p3,
+    band
+  };
+  currentResult = resultObj;
+
+  // Save to shared results
+  allResults.unshift(resultObj);
+  if(allResults.length>500) allResults=allResults.slice(0,500);
+  await storageSet(RESULTS_KEY, allResults, true);
+
+  // Update user profile
+  userProfile.attempts = (userProfile.attempts||0)+1;
+  await storageSet(PROFILE_KEY, userProfile, false);
+
+  // Fill result screen
+  fillResultScreen(resultObj, band);
+  showScreen('resultDetailScreen');
+
+  if(tg) tg.sendData(JSON.stringify({scaled,theta,grade:band.grade,correct,wrong,empty}));
+}
+
+function fillResultScreen(r, band){
+  const gc=document.getElementById('rGradeRing');
   gc.textContent=band.grade;
   gc.style.color=band.color;
   gc.style.borderColor=band.color;
-  gc.style.boxShadow=`0 0 20px ${band.color}44`;
-  document.getElementById('gradeLabel').textContent=band.label;
+  gc.style.boxShadow=`0 0 24px ${band.color}44`;
+  gc.style.setProperty('--c',band.color);
+  document.getElementById('rGradeName').textContent=band.lbl;
 
-  document.getElementById('thetaVal').textContent=`θ = ${theta > 0 ? '+' : ''}${theta}`;
-  document.getElementById('thetaDesc').textContent=thetaDescription(theta);
+  document.getElementById('rScore').textContent=r.scaled;
+  document.getElementById('rScoreSub').textContent=`ball · xom: ${r.raw}/${RAW_MAX} · Rasch bilan hisoblangan`;
 
-  document.getElementById('scorePct').textContent=scaled;
-  document.getElementById('scoreSub').textContent=`ball (xom: ${Math.round(raw*10)/10} / ${RAW_MAX})`;
-  document.getElementById('stC').textContent=correct;
-  document.getElementById('stW').textContent=wrong;
-  document.getElementById('stE').textContent=empty;
+  const tSign = r.theta>=0?'+':'';
+  document.getElementById('rTheta').textContent=`θ = ${tSign}${r.theta}`;
+  document.getElementById('rThetaDesc').textContent=thetaDesc(r.theta);
 
-  // Breakdown bars
-  document.getElementById('bk1').style.width=pct1+'%';
-  document.getElementById('bk1p').textContent=pct1+'%';
-  document.getElementById('bk2').style.width=pct2+'%';
-  document.getElementById('bk2p').textContent=pct2+'%';
-  document.getElementById('bk3').style.width=pct3+'%';
-  document.getElementById('bk3p').textContent=pct3+'%';
+  document.getElementById('rC').textContent=r.correct;
+  document.getElementById('rW').textContent=r.wrong;
+  document.getElementById('rE').textContent=r.empty;
 
-  // Cert band
-  const cb=document.getElementById('certBand');
-  cb.style.background=band.bg;
-  cb.style.border=`1px solid ${band.color}44`;
-  document.getElementById('certTitle').style.color=band.color;
-  document.getElementById('certTitle').textContent='🏅 '+band.cert;
-  document.getElementById('certDesc').textContent=
-    `${band.grade} darajasi • ${scaled} ball • ${scaled>=46?'Sertifikat talablari bajarildi':'Minimal ball (46) ga yetmadi'}`;
+  document.getElementById('bk1').style.width=r.p1+'%';
+  document.getElementById('bk1p').textContent=r.p1+'%';
+  document.getElementById('bk2').style.width=r.p2+'%';
+  document.getElementById('bk2p').textContent=r.p2+'%';
+  document.getElementById('bk3').style.width=r.p3+'%';
+  document.getElementById('bk3p').textContent=r.p3+'%';
 
-  if(tg) tg.sendData(JSON.stringify({scaled,raw:Math.round(raw*10)/10,theta,grade:band.grade,correct,wrong,empty}));
-  showScreen('resultScreen');
+  const cc=document.getElementById('rCertCard');
+  cc.style.background=band.bg;
+  cc.style.border=`1px solid ${band.color}44`;
+  document.getElementById('rCertIcon').textContent=band.icon;
+  document.getElementById('rCertTitle').style.color=band.color;
+  document.getElementById('rCertTitle').textContent=band.cert;
+  document.getElementById('rCertSub').textContent=
+    `${band.grade} · ${r.scaled} ball · ${r.scaled>=46?'Sertifikat talablari bajarildi ✓':'Minimal ball (46) ga yetmadi'}`;
 }
 
-function showDetail(){showScreen('mainApp');document.getElementById('mainApp').scrollTop=0;}
+function showAnswerDetail(){
+  // Just scroll to top — answers already highlighted in testScreen
+  fromDetail=true;
+  showScreen('testScreen');
+  document.getElementById('testScreen').scrollTop=0;
+}
+
+function backFromResult(){
+  if(fromDetail){ showScreen('resultDetailScreen'); fromDetail=false; return; }
+  showScreen('appScreen');
+  renderDashboard();
+  renderHistory();
+}
 
 function retryTest(){
   for(let i=36;i<=45;i++){
     ['a','b'].forEach(p=>{
       const ta=document.getElementById(`w-${i}-${p}`);
-      const h=document.getElementById(`hint-${i}-${p}`);
-      if(ta){ta.readOnly=false;ta.value='';ta.className='wi';}
+      const h=document.getElementById(`wh-${i}-${p}`);
+      if(ta){ta.readOnly=false;ta.value='';ta.className='w-inp';}
       if(h){h.style.display='none';h.textContent='';}
     });
   }
-  buildTestApp();
-  showScreen('mainApp');
-  document.getElementById('mainApp').scrollTop=0;
+  buildTestUI();
+  showScreen('testScreen');
+  document.getElementById('testScreen').scrollTop=0;
 }
 
+// ──────────────────────────────────────────
+// DASHBOARD
+// ──────────────────────────────────────────
+function renderDashboard(){
+  // Date
+  document.getElementById('dashDate').textContent = new Date().toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  // Hero name
+  document.getElementById('heroName').textContent = userProfile.name||'Ishtirokchi';
+  document.getElementById('dashBadge').textContent = '🎓 SertTest';
+
+  // My results only
+  const myR = allResults.filter(r=>r.userId===userProfile.userId);
+  const totalAttempts = myR.length;
+  const bestScore = myR.length?Math.max(...myR.map(r=>r.scaled)):0;
+  const avgScore  = myR.length?Math.round(myR.reduce((a,r)=>a+r.scaled,0)/myR.length):0;
+  const bestBand  = myR.length?getBand(bestScore):null;
+
+  // Stats grid
+  const sg=document.getElementById('dashStats'); sg.innerHTML='';
+  const stats=[
+    {ic:'🎯',val:totalAttempts,lbl:"Jami urinishlar"},
+    {ic:'⭐',val:bestScore?bestScore+'%':'—',lbl:'Eng yuqori ball'},
+    {ic:'📈',val:avgScore?avgScore+'%':'—',lbl:'O\'rtacha ball'},
+    {ic:'🏅',val:bestBand?bestBand.grade:'—',lbl:'Eng yaxshi daraja',color:bestBand?.color},
+  ];
+  stats.forEach(s=>{
+    const c=document.createElement('div'); c.className='stat-card';
+    c.innerHTML=`<div class="ic">${s.ic}</div>
+      <div class="val" style="${s.color?'color:'+s.color:''}">${s.val}</div>
+      <div class="lbl">${s.lbl}</div>`;
+    sg.appendChild(c);
+  });
+
+  // Active test
+  const atw=document.getElementById('activTestWrap');
+  if(adminConfig.testCode){
+    atw.style.display='block';
+    document.getElementById('atcCode').textContent=adminConfig.testCode;
+  } else { atw.style.display='none'; }
+
+  // Best band
+  const bbw=document.getElementById('bestBandWrap');
+  if(bestBand&&myR.length){
+    bbw.style.display='block';
+    const bb=document.getElementById('bestBand');
+    bb.style.background=bestBand.bg;
+    bb.style.border=`1px solid ${bestBand.color}44`;
+    bb.innerHTML=`<div class="cs-icon">${bestBand.icon}</div>
+      <div class="cs-info">
+        <div class="cs-title" style="color:${bestBand.color}">${bestBand.cert}</div>
+        <div class="cs-sub">${bestBand.grade} daraja · ${bestScore} ball</div>
+      </div>`;
+  } else bbw.style.display='none';
+
+  // Recent results
+  const rw=document.getElementById('recentWrap');
+  const rl=document.getElementById('recentList');
+  rl.innerHTML='';
+  if(myR.length){
+    rw.style.display='block';
+    myR.slice(0,5).forEach(r=>{
+      const band=getBand(r.scaled);
+      const item=document.createElement('div'); item.className='result-item';
+      item.innerHTML=`
+        <div class="ri-grade" style="color:${band.color};border-color:${band.color};background:${band.bg}">${band.grade}</div>
+        <div class="ri-info">
+          <div class="ri-code">📝 ${r.code}</div>
+          <div class="ri-meta">${r.date} · ${r.correct}✅ ${r.wrong}❌ ${r.empty}⬜</div>
+        </div>
+        <div class="ri-score" style="color:${band.color}">${r.scaled}</div>`;
+      item.onclick=()=>viewResult(r);
+      rl.appendChild(item);
+    });
+  } else rw.style.display='none';
+}
+
+// ──────────────────────────────────────────
+// TESTS PAGE
+// ──────────────────────────────────────────
+function renderTests(){
+  const wrap=document.getElementById('testsWrap'); wrap.innerHTML='';
+  if(!adminConfig.testCode){
+    wrap.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-lbl">Hozircha faol test yo'q</div></div>`;
+    return;
+  }
+
+  // My attempts on this test
+  const myR=allResults.filter(r=>r.userId===userProfile.userId&&r.code===adminConfig.testCode);
+
+  const card=document.createElement('div'); card.className='test-card';
+  card.innerHTML=`
+    <div class="tc-head">
+      <div class="tc-code">📝 ${adminConfig.testCode}</div>
+      <div class="tc-status st-active">Faol</div>
+    </div>
+    <div class="tc-meta">45 savol · ABCD + ABCDEF + Yozma · ${myR.length} marta urinilgan</div>
+    <div class="tc-progress" style="margin-top:10px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:5px">
+        ${myR.length?`Eng yuqori: ${Math.max(...myR.map(r=>r.scaled))} ball`:'Hali urinilmagan'}
+      </div>
+      <button class="sub-btn" style="padding:10px;font-size:13px" onclick="openTest('${adminConfig.testCode}')">▶ Boshlash</button>
+    </div>`;
+  wrap.appendChild(card);
+
+  // Past attempts on this test
+  if(myR.length){
+    const h=document.createElement('div');
+    h.innerHTML='<div class="section-title" style="margin-top:16px;padding:0">Mening urinishlarim</div>';
+    wrap.appendChild(h);
+    myR.slice(0,5).forEach(r=>{
+      const band=getBand(r.scaled);
+      const it=document.createElement('div'); it.className='result-item';
+      it.style.marginTop='8px';
+      it.innerHTML=`
+        <div class="ri-grade" style="color:${band.color};border-color:${band.color};background:${band.bg}">${band.grade}</div>
+        <div class="ri-info">
+          <div class="ri-code">${r.date}</div>
+          <div class="ri-meta">${r.correct}✅ ${r.wrong}❌ ${r.empty}⬜ · θ=${r.theta}</div>
+        </div>
+        <div class="ri-score" style="color:${band.color}">${r.scaled}</div>`;
+      it.onclick=()=>viewResult(r);
+      wrap.appendChild(it);
+    });
+  }
+}
+
+// ──────────────────────────────────────────
+// HISTORY
+// ──────────────────────────────────────────
+function renderHistory(){
+  const wrap=document.getElementById('histWrap'); wrap.innerHTML='';
+  const myR=allResults.filter(r=>r.userId===userProfile.userId);
+  if(!myR.length){
+    wrap.innerHTML=`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-lbl">Hali natijalar yo'q<br>Birinchi testni boshlang!</div></div>`;
+    return;
+  }
+  myR.forEach(r=>{
+    const band=getBand(r.scaled);
+    const it=document.createElement('div'); it.className='hist-item';
+    it.innerHTML=`
+      <div class="hi-grade" style="color:${band.color};border-color:${band.color};background:${band.bg}">${band.grade}</div>
+      <div class="hi-info">
+        <div class="hi-code">📝 ${r.code}</div>
+        <div class="hi-date">${r.date}</div>
+        <div class="hi-details">${r.correct}✅ ${r.wrong}❌ ${r.empty}⬜ · θ=${r.theta>=0?'+':''}${r.theta}</div>
+      </div>
+      <div>
+        <div class="hi-score" style="color:${band.color}">${r.scaled}</div>
+        <div style="font-size:11px;color:var(--muted);text-align:right">ball</div>
+      </div>`;
+    it.onclick=()=>viewResult(r);
+    wrap.appendChild(it);
+  });
+}
+
+function viewResult(r){
+  const band=r.band||getBand(r.scaled);
+  fillResultScreen(r, band);
+  showScreen('resultDetailScreen');
+}
+
+// ──────────────────────────────────────────
+// PROFILE
+// ──────────────────────────────────────────
+function renderProfile(){
+  const wrap=document.getElementById('profWrap'); wrap.innerHTML='';
+  const myR=allResults.filter(r=>r.userId===userProfile.userId);
+  const best=myR.length?Math.max(...myR.map(r=>r.scaled)):0;
+  const avg=myR.length?Math.round(myR.reduce((a,r)=>a+r.scaled,0)/myR.length):0;
+  const bestBand=myR.length?getBand(best):null;
+
+  // Hero
+  const h=document.createElement('div'); h.className='prof-hero';
+  h.innerHTML=`
+    <div class="ph-avatar">👤</div>
+    <div class="ph-name">${userProfile.name||'Ishtirokchi'}</div>
+    <div class="ph-sub">SertTest foydalanuvchisi</div>
+    <div class="ph-chips">
+      <div class="ph-chip">${myR.length} urinish</div>
+      ${bestBand?`<div class="ph-chip" style="color:${bestBand.color}">${bestBand.grade} eng yaxshi</div>`:''}
+    </div>`;
+  wrap.appendChild(h);
+
+  // Stats
+  const sg=document.createElement('div'); sg.className='prof-stats';
+  [{val:myR.length,lbl:'Urinishlar'},{val:best?best+'%':'—',lbl:'Eng yuqori'},{val:avg?avg+'%':'—',lbl:"O'rtacha"}].forEach(s=>{
+    const c=document.createElement('div'); c.className='ps-card';
+    c.innerHTML=`<div class="ps-val">${s.val}</div><div class="ps-lbl">${s.lbl}</div>`;
+    sg.appendChild(c);
+  });
+  wrap.appendChild(sg);
+
+  // Score history chart
+  if(myR.length>1){
+    const gh=document.createElement('div'); gh.className='grade-history';
+    const recent=myR.slice(0,8).reverse();
+    const mx=Math.max(...recent.map(r=>r.scaled))||100;
+    gh.innerHTML=`<div class="gh-title">So'nggi natijalar dinamikasi</div>
+      <div class="gh-bars">${recent.map(r=>{
+        const band=getBand(r.scaled);
+        const h=Math.round((r.scaled/mx)*70)+10;
+        return `<div class="gh-bar-wrap">
+          <div class="gh-bar" style="background:${band.color};height:${h}px"></div>
+          <div class="gh-lbl">${r.scaled}</div>
+        </div>`;
+      }).join('')}</div>`;
+    wrap.appendChild(gh);
+  }
+
+  // Grades breakdown
+  const grades=['A+','A','B+','B','C+','C','F'];
+  const counts={};
+  grades.forEach(g=>counts[g]=myR.filter(r=>r.grade===g).length);
+  const gb=document.createElement('div'); gb.className='grade-history';
+  gb.innerHTML=`<div class="gh-title">Darajalar bo'yicha taqsimot</div>
+    ${grades.filter(g=>counts[g]>0).map(g=>{
+      const band=getBand(BANDS.find(b=>b.grade===g)?.min||0);
+      return `<div class="bk-row" style="margin-bottom:6px">
+        <div class="bk-lbl" style="color:${band.color};font-weight:700">${g}</div>
+        <div class="bk-bw"><div class="bk-bf" style="background:${band.color};width:${Math.round(counts[g]/myR.length*100)}%"></div></div>
+        <div class="bk-pct" style="color:${band.color}">${counts[g]}x</div>
+      </div>`;
+    }).join('')}`;
+  wrap.appendChild(gb);
+
+  // Recent
+  if(myR.length){
+    const rt=document.createElement('div');
+    rt.innerHTML='<div class="section-title" style="padding:0;margin-bottom:10px">So\'nggi urinishlar</div>';
+    wrap.appendChild(rt);
+    myR.slice(0,5).forEach(r=>{
+      const band=getBand(r.scaled);
+      const it=document.createElement('div'); it.className='hist-item'; it.style.marginBottom='8px';
+      it.innerHTML=`
+        <div class="hi-grade" style="color:${band.color};border-color:${band.color};background:${band.bg}">${band.grade}</div>
+        <div class="hi-info">
+          <div class="hi-code">📝 ${r.code}</div>
+          <div class="hi-date">${r.date}</div>
+        </div>
+        <div class="hi-score" style="color:${band.color}">${r.scaled}</div>`;
+      it.onclick=()=>viewResult(r);
+      wrap.appendChild(it);
+    });
+  }
+}
+
+// ──────────────────────────────────────────
+// UTILS
+// ──────────────────────────────────────────
 function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// Keyboard helpers
+document.getElementById('adminPass').addEventListener('keydown',e=>{if(e.key==='Enter')checkAdmin();});
 </script>
 </body>
 </html>
