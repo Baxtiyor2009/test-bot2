@@ -3,809 +3,1145 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SertTest — Milliy Sertifikat Tizimi</title>
+<title>SertTest Pro</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
+/* ════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════ */
 :root{
-  --bg:#080b14;
-  --s1:#0e1220;
-  --s2:#141926;
-  --s3:#1c2236;
-  --acc:#4f8ef7;
-  --acc2:#f7614f;
-  --acc3:#4fd984;
-  --acc4:#f7c44f;
-  --text:#dde3f5;
-  --muted:#6b7399;
-  --border:#1f2640;
-  --r:12px;
+  --bg:#07090f;
+  --s1:#0d1018;
+  --s2:#121520;
+  --s3:#181c28;
+  --s4:#1e2333;
+  --acc:#5b6ef5;
+  --acc-glow:#5b6ef544;
+  --green:#22d37a;
+  --red:#f05c5c;
+  --yellow:#f0b429;
+  --purple:#9f7aea;
+  --cyan:#22d3c8;
+  --orange:#f07830;
+  --text:#e2e8f8;
+  --muted:#5a6282;
+  --border:#1a1f32;
+  --r:14px;
+  --coin:#f0b429;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-.screen{display:none;min-height:100vh;flex-direction:column;}
-.screen.active{display:flex;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden;}
+button{font-family:'Plus Jakarta Sans',sans-serif;}
 
-/* ── SPLASH ── */
-#splash{align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 20%,#0d1f4a,var(--bg) 65%);}
-.splash-logo{font-size:60px;margin-bottom:16px;animation:float 3s ease-in-out infinite;}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.splash-title{font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:4px;}
-.splash-sub{font-size:13px;color:var(--muted);margin-bottom:36px;text-align:center;}
-.splash-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:340px;}
-.inp-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
-.inp-row{display:flex;gap:9px;}
-.inp{flex:1;background:var(--s3);border:2px solid var(--border);border-radius:10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;padding:11px 14px;letter-spacing:3px;outline:none;transition:border-color .2s;}
-.inp:focus{border-color:var(--acc);}
-.inp::placeholder{color:#2a3050;}
-.go-btn{background:var(--acc);color:white;border:none;border-radius:10px;padding:11px 18px;font-size:18px;cursor:pointer;transition:opacity .2s,transform .1s;}
-.go-btn:active{transform:scale(.95);opacity:.85;}
-.err{font-size:12px;color:var(--acc2);font-weight:600;margin-top:9px;display:none;text-align:center;}
-.link-row{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
-.ghost-btn{background:transparent;border:1.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Sora',sans-serif;font-size:13px;font-weight:600;padding:10px;cursor:pointer;transition:all .2s;}
+/* ════ SCREEN STACK ════ */
+.screen{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+  background:var(--bg);
+  overflow:hidden;
+  z-index:10;
+}
+.screen.active{transform:translateX(0);}
+.screen.prev{transform:translateX(-30%);}
+
+/* ════ SCROLLABLE CONTENT ════ */
+.scroll-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.scroll-body.with-nav{padding-bottom:72px;}
+
+/* ════ HEADER ════ */
+.hdr{
+  background:var(--s1);
+  border-bottom:1px solid var(--border);
+  padding:14px 16px;
+  display:flex;align-items:center;gap:12px;
+  flex-shrink:0;
+  position:relative;
+  z-index:5;
+}
+.hdr-back{
+  width:34px;height:34px;border-radius:10px;
+  background:var(--s3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;flex-shrink:0;
+}
+.hdr-info{flex:1;}
+.hdr-title{font-size:16px;font-weight:800;letter-spacing:-.3px;}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.coin-badge{
+  display:flex;align-items:center;gap:5px;
+  background:var(--s3);border:1px solid #f0b42933;
+  border-radius:20px;padding:5px 10px;cursor:pointer;
+}
+.coin-badge .ic{font-size:14px;}
+.coin-badge .amt{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--coin);}
+
+/* ════ BOTTOM NAV ════ */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--s1);
+  border-top:1px solid var(--border);
+  display:flex;z-index:100;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:9px 4px 7px;cursor:pointer;
+  position:relative;transition:all .2s;
+}
+.bn-ic{font-size:21px;transition:transform .2s;}
+.bn-lbl{font-size:10px;font-weight:700;color:var(--muted);margin-top:2px;transition:color .2s;}
+.bn-item.active .bn-lbl{color:var(--acc);}
+.bn-item.active .bn-ic{transform:translateY(-2px);}
+.bn-dot{width:4px;height:4px;border-radius:50%;background:var(--acc);position:absolute;top:6px;opacity:0;transition:opacity .2s;}
+.bn-item.active .bn-dot{opacity:1;}
+
+/* ════ SPLASH ════ */
+#splashScreen{z-index:50;background:var(--bg);}
+.splash-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%,#1a1f5a,transparent),
+    radial-gradient(ellipse 50% 40% at 80% 80%,#0d2a1a,transparent);
+}
+.splash-body{
+  position:relative;z-index:2;
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:32px 24px;
+}
+.splash-logo-wrap{position:relative;margin-bottom:24px;}
+.splash-logo{font-size:72px;animation:logoFloat 3s ease-in-out infinite;display:block;}
+@keyframes logoFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+.splash-ring{
+  position:absolute;inset:-16px;border-radius:50%;
+  border:2px solid var(--acc);opacity:.15;
+  animation:ringPulse 2s ease-in-out infinite;
+}
+@keyframes ringPulse{0%,100%{transform:scale(1);opacity:.15}50%{transform:scale(1.1);opacity:.3}}
+.splash-title{font-size:32px;font-weight:800;letter-spacing:-1px;margin-bottom:4px;}
+.splash-title span{color:var(--acc);}
+.splash-sub{font-size:14px;color:var(--muted);margin-bottom:40px;text-align:center;line-height:1.5;}
+.splash-card{
+  width:100%;max-width:360px;
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:20px;padding:24px;
+  box-shadow:0 24px 60px #00000060;
+}
+.lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.inp-row{display:flex;gap:8px;}
+.inp{
+  flex:1;background:var(--s3);border:2px solid var(--border);
+  border-radius:11px;color:var(--text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:17px;font-weight:700;
+  padding:12px 14px;letter-spacing:3px;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.inp:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-glow);}
+.inp::placeholder{color:#252840;letter-spacing:2px;}
+.primary-btn{
+  background:linear-gradient(135deg,var(--acc),#7c5ef5);
+  color:white;border:none;border-radius:11px;
+  padding:12px 18px;font-size:18px;
+  cursor:pointer;transition:opacity .2s,transform .1s;
+  box-shadow:0 4px 20px var(--acc-glow);
+}
+.primary-btn:active{transform:scale(.94);opacity:.85;}
+.err{font-size:12px;color:var(--red);font-weight:600;margin-top:9px;display:none;text-align:center;}
+.splash-links{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+.ghost-btn{
+  background:transparent;border:1.5px solid var(--border);
+  border-radius:11px;color:var(--muted);
+  font-size:13px;font-weight:600;padding:11px;
+  cursor:pointer;transition:all .2s;
+}
 .ghost-btn:hover{border-color:var(--acc);color:var(--acc);}
 
-/* ── BOTTOM NAV ── */
-.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom);}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;transition:all .2s;gap:3px;}
-.bnav-icon{font-size:20px;}
-.bnav-lbl{font-size:10px;font-weight:700;color:var(--muted);}
-.bnav-item.active .bnav-lbl{color:var(--acc);}
-.bnav-item.active .bnav-icon{filter:drop-shadow(0 0 6px var(--acc));}
-
-/* ── MAIN LAYOUT ── */
-.page{display:none;flex:1;overflow-y:auto;padding-bottom:72px;}
-.page.active{display:block;}
-.top-bar{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;}
-.top-title{font-size:16px;font-weight:800;}
-.top-sub{font-size:11px;color:var(--muted);}
-.top-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:#4f8ef722;color:var(--acc);border:1px solid #4f8ef733;}
+/* ════ MAIN APP ════ */
+#appScreen{z-index:20;}
 
 /* ── DASHBOARD ── */
-.dash-hero{padding:20px 16px 0;}
-.hero-greeting{font-size:13px;color:var(--muted);margin-bottom:4px;}
-.hero-name{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:16px;}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
-.stat-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
-.stat-card .ic{font-size:24px;margin-bottom:6px;}
-.stat-card .val{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;}
-.stat-card .lbl{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;}
-.best-grade{font-size:11px;font-weight:800;padding:2px 8px;border-radius:8px;display:inline-block;margin-top:4px;}
+.dash-hero{
+  padding:20px 16px;
+  background:linear-gradient(180deg,#0d1230 0%,transparent 100%);
+}
+.dh-greeting{font-size:13px;color:var(--muted);margin-bottom:3px;}
+.dh-name{font-size:23px;font-weight:800;letter-spacing:-.5px;margin-bottom:16px;}
+.dh-name span{
+  background:linear-gradient(135deg,var(--acc),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.kpi{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;
+  position:relative;overflow:hidden;
+}
+.kpi::before{
+  content:'';position:absolute;
+  top:-20px;right:-20px;
+  width:70px;height:70px;border-radius:50%;
+  opacity:.06;
+}
+.kpi.k1::before{background:var(--acc);}
+.kpi.k2::before{background:var(--green);}
+.kpi.k3::before{background:var(--yellow);}
+.kpi.k4::before{background:var(--purple);}
+.kpi-ic{font-size:22px;margin-bottom:6px;}
+.kpi-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;line-height:1;}
+.kpi-lbl{font-size:11px;color:var(--muted);font-weight:600;margin-top:4px;}
 
-.section-title{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:0 16px;margin-bottom:10px;}
+/* active test banner */
+.test-banner{
+  margin:0 16px 20px;
+  background:linear-gradient(135deg,#0e1a40,#0a2218);
+  border:1px solid #1a3060;
+  border-radius:var(--r);padding:16px;
+  cursor:pointer;position:relative;overflow:hidden;
+}
+.test-banner::after{
+  content:'';position:absolute;
+  top:-30px;right:-30px;width:120px;height:120px;
+  border-radius:50%;
+  background:radial-gradient(circle,#5b6ef522,transparent);
+}
+.tb-tag{font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.tb-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.tb-code{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;margin-bottom:4px;}
+.tb-meta{font-size:12px;color:var(--muted);}
+.tb-price{
+  position:absolute;top:16px;right:16px;
+  background:#f0b42922;border:1px solid #f0b42933;
+  border-radius:8px;padding:4px 10px;
+  font-size:12px;font-weight:700;color:var(--coin);
+}
+.tb-cta{
+  margin-top:12px;display:flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:700;color:var(--acc);
+}
 
-/* Recent results */
-.result-list{padding:0 16px;display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
-.result-item{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;}
-.ri-grade{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;flex-shrink:0;border:2px solid;}
-.ri-info{flex:1;}
-.ri-code{font-size:13px;font-weight:700;}
-.ri-meta{font-size:11px;color:var(--muted);margin-top:2px;}
-.ri-score{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--acc3);}
+/* section label */
+.sec-lbl{
+  font-size:12px;font-weight:800;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.8px;
+  padding:0 16px;margin-bottom:10px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sec-lbl a{font-size:11px;font-weight:600;color:var(--acc);cursor:pointer;}
 
-/* Best band */
-.cert-strip{margin:0 16px 20px;border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;}
-.cs-icon{font-size:32px;}
-.cs-info .cs-title{font-size:15px;font-weight:800;}
-.cs-info .cs-sub{font-size:12px;opacity:.7;margin-top:2px;}
+/* result cards */
+.results-list{padding:0 16px;display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.rc{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:13px 14px;
+  display:flex;align-items:center;gap:11px;cursor:pointer;
+  transition:border-color .2s,transform .15s;
+}
+.rc:active{transform:scale(.98);}
+.rc-grade{
+  width:46px;height:46px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;
+  border:2px solid;flex-shrink:0;
+}
+.rc-info{flex:1;min-width:0;}
+.rc-code{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rc-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.rc-score{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;text-align:right;flex-shrink:0;}
 
-/* Active test card */
-.active-test-card{margin:0 16px 20px;background:linear-gradient(135deg,#0d1f4a,#0e2235);border:1px solid #1a3060;border-radius:var(--r);padding:16px;cursor:pointer;}
-.atc-lbl{font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
-.atc-code{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;margin-bottom:4px;}
-.atc-sub{font-size:12px;color:var(--muted);}
-.atc-arrow{font-size:20px;margin-top:10px;}
+/* ── LEADERBOARD ── */
+.leader-wrap{padding:0 16px 20px;}
+.leader-podium{display:flex;align-items:flex-end;gap:10px;justify-content:center;padding:20px 0;margin-bottom:16px;}
+.pod{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.pod-avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;border:3px solid;}
+.pod-name{font-size:11px;font-weight:700;text-align:center;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pod-score{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;}
+.pod-rank{font-size:20px;}
+.pod.first .pod-avatar{width:60px;height:60px;border-color:var(--yellow);}
+.pod.second .pod-avatar{width:50px;height:50px;border-color:#94a3b8;}
+.pod.third .pod-avatar{width:44px;height:44px;border-color:#cd7c2f;}
 
-/* ── TESTS PAGE ── */
-.tests-wrap{padding:16px;display:flex;flex-direction:column;gap:10px;}
-.test-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:border-color .2s;}
-.test-card:hover{border-color:var(--acc);}
-.tc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.tc-code{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;}
-.tc-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
-.st-active{background:#4f8ef722;color:var(--acc);border:1px solid #4f8ef733;}
-.st-done{background:#4fd98422;color:var(--acc3);border:1px solid #4fd98433;}
-.tc-meta{font-size:12px;color:var(--muted);}
-.tc-progress{margin-top:10px;}
-.prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
-.prog-fill{height:100%;background:var(--acc);border-radius:2px;}
+.leader-list{display:flex;flex-direction:column;gap:7px;}
+.ll-item{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:12px;padding:12px 14px;
+  display:flex;align-items:center;gap:11px;
+}
+.ll-rank{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;font-weight:700;color:var(--muted);
+  width:24px;text-align:center;flex-shrink:0;
+}
+.ll-name{flex:1;font-size:13px;font-weight:600;}
+.ll-grade{font-size:12px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.ll-theta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+.ll-score{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;}
+.ll-item.is-me{border-color:var(--acc);background:#0e122a;}
 
-/* ── TEST TAKING ── */
-#testScreen{overflow-y:auto;padding-bottom:0;}
-.test-header{background:var(--s1);border-bottom:1px solid var(--border);padding:12px 14px;position:sticky;top:0;z-index:100;}
-.th-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
-.th-title{font-size:15px;font-weight:800;}
-.th-close{background:var(--s3);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-weight:700;padding:5px 11px;cursor:pointer;}
-.th-chips{display:flex;gap:6px;}
-.th-chip{font-size:11px;background:var(--s3);border:1px solid var(--border);border-radius:7px;padding:3px 9px;color:var(--muted);}
-.th-chip span{color:var(--text);font-weight:700;}
-.swrap{padding:12px 12px 0;}
-.shdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.slbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;}
-.srng{font-size:11px;color:var(--muted);margin-left:auto;}
-.q-grid{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-.q-row{display:grid;grid-template-columns:26px 1fr;align-items:center;gap:6px;}
-.qn{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);text-align:right;}
-.opts{display:flex;gap:4px;}
-.ob{flex:1;height:33px;border-radius:8px;border:2px solid var(--border);background:var(--s3);color:var(--muted);font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
-.ob:active{transform:scale(.93);}
-.ob.sel-A{background:#4fd98422;border-color:#4fd984;color:#4fd984}
-.ob.sel-B{background:#4f8ef722;border-color:#4f8ef7;color:#4f8ef7}
-.ob.sel-C{background:#f7614f22;border-color:#f7614f;color:#f7614f}
-.ob.sel-D{background:#f7c44f22;border-color:#f7c44f;color:#f7c44f}
-.ob.sel-E{background:#c084fc22;border-color:#c084fc;color:#c084fc}
-.ob.sel-F{background:#fb923c22;border-color:#fb923c;color:#fb923c}
-.ob.correct{background:#4fd98433;border-color:#4fd984;color:#4fd984}
-.ob.wrong{background:#f7614f33;border-color:#f7614f;color:#f7614f}
-.ob.missed{background:#f7c44f33;border-color:#f7c44f;color:#f7c44f}
-.w-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
-.w-row{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:11px 12px;}
-.w-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--acc);margin-bottom:7px;}
-.w-parts{display:flex;gap:7px;}
-.w-part{flex:1;display:flex;flex-direction:column;gap:3px;}
-.w-plbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;}
-.w-inp{background:var(--s3);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:12px;font-weight:600;padding:7px 9px;outline:none;resize:none;width:100%;transition:border-color .2s;}
-.w-inp:focus{border-color:var(--acc);}
-.w-inp::placeholder{color:#2a3050;}
-.w-inp.ci{border-color:#4fd984;background:#4fd98411;}
-.w-inp.wi{border-color:#f7614f;background:#f7614f11;}
-.w-hint{font-size:11px;color:#f7c44f;font-weight:700;margin-top:2px;display:none;}
-.sub-area{padding:12px;padding-bottom:24px;}
-.p-wrap{background:var(--s3);border-radius:8px;height:4px;margin-bottom:9px;overflow:hidden;}
-.p-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc3));border-radius:8px;transition:width .4s;}
-.p-lbl{font-size:11px;color:var(--muted);margin-bottom:9px;text-align:center;}
-.sub-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--acc),var(--acc3));border:none;border-radius:var(--r);color:white;font-family:'Sora',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .2s,transform .1s;}
-.sub-btn:active{transform:scale(.98);opacity:.88;}
-.divider{height:1px;background:var(--border);margin:4px 12px 12px;}
+/* ── TEST SCREEN ── */
+#testScreen{z-index:30;}
+.test-prog-bar{
+  height:3px;background:var(--border);flex-shrink:0;
+}
+.test-prog-fill{
+  height:100%;background:linear-gradient(90deg,var(--acc),var(--green));
+  transition:width .4s;
+}
+.q-section{padding:12px 14px 0;}
+.qs-hdr{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+.qs-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.qs-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;}
+.qs-rng{font-size:11px;color:var(--muted);margin-left:auto;}
+.q-list{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.q-row{display:grid;grid-template-columns:24px 1fr;align-items:center;gap:6px;}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-align:right;}
+.q-opts{display:flex;gap:3px;}
+/* Option buttons — distinct colors per letter */
+.ob{
+  flex:1;height:34px;border-radius:8px;
+  border:2px solid var(--border);
+  background:var(--s3);color:var(--muted);
+  font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .15s;
+}
+.ob:active{transform:scale(.9);}
+/* Distinct unselected hover states */
+.ob[data-opt="A"]:not(.selected):not(.correct):not(.wrong):not(.missed):hover{border-color:#22d37a55;color:#22d37a88;}
+.ob[data-opt="B"]:not(.selected):not(.correct):not(.wrong):not(.missed):hover{border-color:#5b6ef555;color:#5b6ef588;}
+.ob[data-opt="C"]:not(.selected):not(.correct):not(.wrong):not(.missed):hover{border-color:#f0b42955;color:#f0b42988;}
+.ob[data-opt="D"]:not(.selected):not(.correct):not(.wrong):not(.missed):hover{border-color:#f05c5c55;color:#f05c5c88;}
+.ob[data-opt="E"]:not(.selected):not(.correct):not(.wrong):not(.missed):hover{border-color:#9f7aea55;color:#9f7aea88;}
+.ob[data-opt="F"]:not(.selected):not(.correct):not(.wrong):not(.missed):hover{border-color:#f0783055;color:#f0783088;}
+/* Selected — each letter unique */
+.ob.selected[data-opt="A"]{background:#22d37a22;border-color:#22d37a;color:#22d37a;}
+.ob.selected[data-opt="B"]{background:#5b6ef522;border-color:#5b6ef5;color:#5b6ef5;}
+.ob.selected[data-opt="C"]{background:#f0b42922;border-color:#f0b429;color:#f0b429;}
+.ob.selected[data-opt="D"]{background:#f05c5c22;border-color:#f05c5c;color:#f05c5c;}
+.ob.selected[data-opt="E"]{background:#9f7aea22;border-color:#9f7aea;color:#9f7aea;}
+.ob.selected[data-opt="F"]{background:#f0783022;border-color:#f07830;color:#f07830;}
+/* Result states */
+.ob.correct{background:#22d37a33;border-color:#22d37a;color:#22d37a;}
+.ob.wrong{background:#f05c5c33;border-color:#f05c5c;color:#f05c5c;}
+.ob.missed{background:#f0b42933;border-color:#f0b429;color:#f0b429;}
+
+/* Written */
+.w-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px 13px;margin-bottom:8px;}
+.w-qnum{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--acc);margin-bottom:8px;}
+.w-parts{display:flex;gap:8px;}
+.w-part{flex:1;}
+.w-plbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+.w-ta{
+  width:100%;background:var(--s3);
+  border:2px solid var(--border);border-radius:9px;
+  color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:12px;font-weight:500;
+  padding:8px 10px;outline:none;resize:none;
+  transition:border-color .2s;
+}
+.w-ta:focus{border-color:var(--acc);}
+.w-ta::placeholder{color:#252840;}
+.w-ta.ci{border-color:var(--green);background:#22d37a11;}
+.w-ta.wi{border-color:var(--red);background:#f05c5c11;}
+.w-hint{font-size:11px;color:var(--yellow);font-weight:600;margin-top:3px;display:none;}
+.test-footer{padding:12px 14px 24px;flex-shrink:0;}
+.p-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:8px;}
+.p-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--green));border-radius:2px;transition:width .4s;}
+.p-lbl{font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px;}
+.submit-btn{
+  width:100%;padding:15px;border:none;border-radius:var(--r);
+  background:linear-gradient(135deg,var(--acc),var(--green));
+  color:white;font-size:15px;font-weight:800;cursor:pointer;
+  box-shadow:0 4px 20px #5b6ef533;transition:opacity .2s,transform .1s;
+}
+.submit-btn:active{transform:scale(.98);opacity:.88;}
+.div{height:1px;background:var(--border);margin:4px 14px 12px;}
 
 /* ── RESULT SCREEN ── */
-#resultDetailScreen{overflow-y:auto;padding-bottom:80px;}
-.res-hero{padding:24px 16px;background:linear-gradient(180deg,#0a1a38,transparent);}
-.res-grade-wrap{text-align:center;margin-bottom:20px;}
-.res-grade-ring{display:inline-flex;align-items:center;justify-content:center;width:100px;height:100px;border-radius:50%;font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;border:3px solid;margin-bottom:8px;position:relative;}
-.res-grade-ring::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid;opacity:.3;}
-.res-grade-name{font-size:14px;font-weight:700;color:var(--muted);}
-.res-score-big{font-family:'JetBrains Mono',monospace;font-size:54px;font-weight:700;text-align:center;color:var(--acc3);line-height:1;margin-bottom:2px;}
-.res-score-sub{text-align:center;font-size:12px;color:var(--muted);margin-bottom:20px;}
-.theta-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin:0 16px 16px;display:flex;gap:12px;align-items:center;}
-.theta-ic{font-size:28px;}
-.theta-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:#60a5fa;}
-.theta-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+#resultScreen{z-index:40;}
+.res-hero{
+  padding:28px 16px 20px;
+  background:linear-gradient(180deg,#0a1030 0%,transparent 100%);
+  text-align:center;
+}
+.grade-ring-wrap{display:inline-block;position:relative;margin-bottom:14px;}
+.grade-ring{
+  width:110px;height:110px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;
+  border:3px solid;
+}
+.grade-glow{
+  position:absolute;inset:-12px;border-radius:50%;
+  border:1px solid;opacity:.2;
+  animation:ringPulse 2s ease-in-out infinite;
+}
+.grade-name{font-size:14px;font-weight:700;margin-bottom:16px;}
+.big-score{
+  font-family:'JetBrains Mono',monospace;
+  font-size:64px;font-weight:700;line-height:1;
+  margin-bottom:4px;
+}
+.big-score-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+
+/* theta card */
+.theta-card{
+  margin:0 16px 14px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;
+  display:flex;align-items:center;gap:14px;
+}
+.theta-ic{font-size:30px;}
+.theta-val{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:#60a5fa;}
+.theta-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
 .theta-desc{font-size:12px;color:var(--text);margin-top:2px;}
-.res-stats{display:flex;gap:8px;padding:0 16px;margin-bottom:14px;}
-.rs-box{flex:1;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;}
-.rs-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;}
-.rs-lbl{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;}
-.rs-c .rs-num{color:#4fd984}.rs-w .rs-num{color:#f7614f}.rs-e .rs-num{color:#f7c44f}
-.breakdown{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin:0 16px 14px;}
+
+/* stats row */
+.s-row{display:flex;gap:8px;padding:0 16px;margin-bottom:14px;}
+.s-box{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;}
+.s-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;}
+.s-lbl{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;}
+
+/* breakdown */
+.bk{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin:0 16px 14px;}
 .bk-ttl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
 .bk-row{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
-.bk-lbl{font-size:11px;color:var(--muted);width:75px;flex-shrink:0;}
-.bk-bw{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden;}
-.bk-bf{height:100%;border-radius:4px;transition:width .6s .2s;}
-.bk-pct{font-size:12px;font-weight:700;width:34px;text-align:right;}
-.cert-card{margin:0 16px 14px;border-radius:var(--r);padding:16px;text-align:center;}
-.cc-badge{font-size:32px;margin-bottom:6px;}
-.cc-title{font-size:16px;font-weight:800;margin-bottom:3px;}
-.cc-sub{font-size:12px;opacity:.7;}
-.res-actions{padding:0 16px;display:flex;flex-direction:column;gap:8px;}
-.det-btn{padding:12px;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
-.retry-btn{padding:12px;background:linear-gradient(135deg,var(--acc),#7c3aed);border:none;border-radius:var(--r);color:white;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.bk-l{font-size:11px;color:var(--muted);width:74px;flex-shrink:0;}
+.bk-bw{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.bk-bf{height:100%;border-radius:3px;transition:width .6s .1s;}
+.bk-p{font-size:11px;font-weight:700;width:32px;text-align:right;}
 
-/* ── HISTORY PAGE ── */
-.hist-wrap{padding:16px;display:flex;flex-direction:column;gap:8px;}
-.hist-item{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;gap:12px;align-items:center;cursor:pointer;}
-.hi-grade{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;flex-shrink:0;border:2px solid;}
-.hi-info{flex:1;}
-.hi-code{font-size:13px;font-weight:700;}
-.hi-date{font-size:11px;color:var(--muted);margin-top:2px;}
-.hi-details{font-size:11px;color:var(--muted);margin-top:4px;}
-.hi-score{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;}
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
-.empty-icon{font-size:48px;margin-bottom:12px;opacity:.5;}
-.empty-lbl{font-size:14px;font-weight:600;}
+/* cert */
+.cert-card{
+  margin:0 16px 14px;
+  border-radius:var(--r);padding:16px;
+  display:flex;align-items:center;gap:14px;
+}
+.cert-icon{font-size:40px;}
+.cert-title{font-size:16px;font-weight:800;margin-bottom:3px;}
+.cert-sub{font-size:12px;opacity:.7;}
 
-/* ── PROFILE PAGE ── */
-.prof-wrap{padding:16px;}
-.prof-hero{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:14px;}
-.ph-avatar{font-size:52px;margin-bottom:10px;}
-.ph-name{font-size:18px;font-weight:800;margin-bottom:3px;}
-.ph-sub{font-size:12px;color:var(--muted);}
-.ph-chips{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap;}
-.ph-chip{font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;background:var(--s3);border:1px solid var(--border);color:var(--muted);}
-.prof-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
-.ps-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;}
-.ps-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;}
-.ps-lbl{font-size:10px;color:var(--muted);font-weight:700;margin-top:2px;}
-.grade-history{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;}
-.gh-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
-.gh-bars{display:flex;align-items:flex-end;gap:6px;height:80px;}
-.gh-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;}
-.gh-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .6s;}
-.gh-lbl{font-size:9px;color:var(--muted);font-weight:700;}
+/* coin reward */
+.coin-reward{
+  margin:0 16px 14px;
+  background:#0d1a08;border:1px solid #22d37a33;
+  border-radius:var(--r);padding:14px 16px;
+  display:flex;align-items:center;gap:12px;
+}
+.cr-icon{font-size:32px;}
+.cr-title{font-size:14px;font-weight:700;color:var(--green);margin-bottom:2px;}
+.cr-sub{font-size:12px;color:var(--muted);}
+
+.res-actions{padding:0 16px 32px;display:flex;flex-direction:column;gap:8px;}
+.sec-btn{
+  padding:13px;background:var(--s2);
+  border:1.5px solid var(--border);border-radius:var(--r);
+  color:var(--text);font-size:13px;font-weight:700;cursor:pointer;
+  transition:border-color .2s;
+}
+.sec-btn:hover{border-color:var(--acc);}
+.ret-btn{
+  padding:13px;border:none;border-radius:var(--r);
+  background:linear-gradient(135deg,var(--acc),#7c5ef5);
+  color:white;font-size:13px;font-weight:700;cursor:pointer;
+}
+
+/* ── COIN SHOP ── */
+#shopScreen{z-index:30;}
+.shop-hero{
+  padding:20px 16px;text-align:center;
+  background:linear-gradient(180deg,#1a1000,transparent);
+}
+.shop-balance{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--s2);border:1px solid #f0b42933;
+  border-radius:20px;padding:8px 20px;margin-bottom:20px;
+}
+.sb-lbl{font-size:12px;color:var(--muted);}
+.sb-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--coin);}
+.shop-grid{padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.shop-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:8px;text-align:center;cursor:pointer;
+  transition:border-color .2s,transform .15s;
+}
+.shop-card:active{transform:scale(.96);}
+.shop-card:hover{border-color:var(--coin);}
+.sc-icon{font-size:40px;}
+.sc-name{font-size:13px;font-weight:700;}
+.sc-price{
+  display:flex;align-items:center;gap:4px;
+  background:#f0b42915;border:1px solid #f0b42933;
+  border-radius:8px;padding:4px 10px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;font-weight:700;color:var(--coin);
+}
+.sc-desc{font-size:11px;color:var(--muted);}
 
 /* ── ADMIN ── */
-#adminScreen{overflow-y:auto;}
-.admin-top{background:var(--s1);border-bottom:1px solid var(--border);padding:13px 14px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;}
-.at-title{font-size:15px;font-weight:800;}
-.at-back{background:var(--s3);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-weight:700;padding:6px 12px;cursor:pointer;}
-.asec{padding:13px 13px 0;}
-.asec h3{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
-.a-inp-row{display:flex;gap:8px;margin-bottom:9px;}
-.a-inp{flex:1;background:var(--s3);border:2px solid var(--border);border-radius:9px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;padding:9px 12px;outline:none;letter-spacing:2px;transition:border-color .2s;}
+#adminScreen{z-index:35;overflow:hidden;}
+.a-sec{padding:13px 14px 0;}
+.a-sec h3{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.a-row{display:flex;gap:8px;margin-bottom:9px;}
+.a-inp{
+  flex:1;background:var(--s3);border:2px solid var(--border);
+  border-radius:10px;color:var(--text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;font-weight:700;
+  padding:9px 12px;outline:none;
+  letter-spacing:2px;transition:border-color .2s;
+}
 .a-inp:focus{border-color:var(--acc);}
-.a-sv{background:var(--acc);border:none;border-radius:9px;color:white;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;padding:9px 15px;cursor:pointer;}
-.a-grid{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-.a-row{display:grid;grid-template-columns:26px 1fr;align-items:center;gap:6px;}
-.a-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);text-align:right;}
-.a-opts{display:flex;gap:4px;}
-.a-ob{flex:1;height:30px;border-radius:7px;border:2px solid var(--border);background:var(--s3);color:var(--muted);font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
-.a-ob.sel-A{background:#4fd98422;border-color:#4fd984;color:#4fd984}
-.a-ob.sel-B{background:#4f8ef722;border-color:#4f8ef7;color:#4f8ef7}
-.a-ob.sel-C{background:#f7614f22;border-color:#f7614f;color:#f7614f}
-.a-ob.sel-D{background:#f7c44f22;border-color:#f7c44f;color:#f7c44f}
-.a-ob.sel-E{background:#c084fc22;border-color:#c084fc;color:#c084fc}
-.a-ob.sel-F{background:#fb923c22;border-color:#fb923c;color:#fb923c}
-.diff-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px;}
-.diff-cell{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:6px 7px;}
-.diff-num{font-size:10px;color:var(--muted);font-weight:700;margin-bottom:3px;}
-.diff-val{width:100%;background:var(--s3);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 6px;outline:none;transition:border-color .2s;}
-.diff-val:focus{border-color:#f7c44f;}
-.wk-row{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:7px;}
-.wk-lbl{font-size:11px;font-weight:800;color:var(--muted);margin-bottom:5px;}
-.wk-parts{display:flex;gap:7px;}
+.a-sv{
+  background:var(--acc);border:none;border-radius:10px;
+  color:white;font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:13px;font-weight:700;padding:9px 15px;cursor:pointer;
+}
+.a-qgrid{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.a-qrow{display:grid;grid-template-columns:24px 1fr;align-items:center;gap:6px;}
+.a-qnum{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-align:right;}
+.a-opts{display:flex;gap:3px;}
+.a-ob{flex:1;height:30px;border-radius:7px;border:2px solid var(--border);background:var(--s3);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
+.a-ob.sel-A{background:#22d37a22;border-color:#22d37a;color:#22d37a}
+.a-ob.sel-B{background:#5b6ef522;border-color:#5b6ef5;color:#5b6ef5}
+.a-ob.sel-C{background:#f0b42922;border-color:#f0b429;color:#f0b429}
+.a-ob.sel-D{background:#f05c5c22;border-color:#f05c5c;color:#f05c5c}
+.a-ob.sel-E{background:#9f7aea22;border-color:#9f7aea;color:#9f7aea}
+.a-ob.sel-F{background:#f0783022;border-color:#f07830;color:#f07830}
+.diff-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:10px;}
+.dc{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:5px 6px;}
+.dc-n{font-size:10px;color:var(--muted);font-weight:700;margin-bottom:2px;}
+.dc-v{width:100%;background:var(--s3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 5px;outline:none;}
+.dc-v:focus{border-color:var(--yellow);}
+.wk-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:7px;}
+.wk-l{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;}
+.wk-row{display:flex;gap:7px;}
 .wk-p{flex:1;}
-.wk-i{background:var(--s3);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:12px;font-weight:600;padding:7px 9px;outline:none;resize:none;width:100%;transition:border-color .2s;}
-.wk-i:focus{border-color:var(--acc);}
-.div{height:1px;background:var(--border);margin:4px 13px 13px;}
+.wk-ta{width:100%;background:var(--s3);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;padding:7px 9px;outline:none;resize:none;transition:border-color .2s;}
+.wk-ta:focus{border-color:var(--acc);}
+.adiv{height:1px;background:var(--border);margin:4px 14px 13px;}
 
-/* ── ADMIN LOGIN ── */
-#adminLoginScreen{align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#1a0d40,var(--bg) 70%);}
+/* ── HISTORY & PROFILE ── */
+.hist-list{padding:14px 16px;display:flex;flex-direction:column;gap:8px;}
+.empty-st{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-ic{font-size:50px;margin-bottom:12px;opacity:.4;}
+.prof-wrap{padding:16px;}
+.prof-hero{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:14px;}
+.ph-av{font-size:54px;margin-bottom:10px;}
+.ph-name{font-size:19px;font-weight:800;margin-bottom:3px;}
+.ph-sub{font-size:12px;color:var(--muted);}
+.ph-chips{display:flex;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.ph-chip{font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;background:var(--s3);border:1px solid var(--border);color:var(--muted);}
+.prof-sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.psg{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;}
+.psg-v{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;}
+.psg-l{font-size:10px;color:var(--muted);font-weight:700;margin-top:2px;}
+.bar-chart{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;}
+.bc-ttl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+.bc-bars{display:flex;align-items:flex-end;gap:5px;height:72px;}
+.bc-bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;}
+.bc-b{width:100%;border-radius:4px 4px 0 0;min-height:4px;}
+.bc-l{font-size:9px;color:var(--muted);font-weight:700;}
+
+/* ── COIN MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:#00000088;
+  display:flex;align-items:flex-end;
+  z-index:200;opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{
+  width:100%;background:var(--s1);
+  border-radius:24px 24px 0 0;
+  padding:24px 20px 40px;
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  border-top:1px solid var(--border);
+}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.modal-price{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--s3);border:1px solid var(--border);
+  border-radius:12px;padding:14px;margin-bottom:16px;
+}
+.mp-coin{font-size:32px;}
+.mp-val{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--coin);}
+.mp-bal{font-size:12px;color:var(--muted);}
+.modal-confirm{
+  width:100%;padding:15px;border:none;border-radius:var(--r);
+  background:linear-gradient(135deg,var(--yellow),var(--orange));
+  color:#000;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:10px;
+}
+.modal-cancel{
+  width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--r);
+  background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;
+}
 
 /* ── TOAST ── */
-.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--text);box-shadow:0 6px 24px #0008;transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:999;white-space:nowrap;}
+.toast{
+  position:fixed;bottom:90px;left:50%;
+  transform:translateX(-50%) translateY(60px);
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:12px;padding:10px 20px;
+  font-size:13px;font-weight:600;color:var(--text);
+  box-shadow:0 8px 30px #00000060;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  z-index:500;white-space:nowrap;
+}
 .toast.show{transform:translateX(-50%) translateY(0);}
-
-/* ── LOADING ── */
-.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--muted);font-size:13px;gap:8px;}
-.spin{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
-<!-- ═══ SPLASH / HOME ═══ -->
-<div id="splash" class="screen active">
-  <div class="splash-logo">🎓</div>
-  <div class="splash-title">SertTest</div>
-  <div class="splash-sub">Milliy sertifikat tizimi<br>Rasch modeli asosida baholash</div>
-  <div class="splash-card">
-    <div class="inp-lbl">Test kodi</div>
-    <div class="inp-row">
-      <input class="inp" id="codeInput" type="text" placeholder="XXXX" maxlength="12" autocomplete="off"/>
-      <button class="go-btn" onclick="startTest()">→</button>
+<!-- ═══════════════════════════════════
+  COIN PURCHASE MODAL
+═══════════════════════════════════ -->
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="payTitle">Testni sotib olish</div>
+    <div class="modal-sub" id="paySubTitle">Bu test uchun to'lov kerak</div>
+    <div class="modal-price">
+      <div class="mp-coin">🪙</div>
+      <div>
+        <div class="mp-val" id="payPrice">50</div>
+        <div class="mp-bal" id="payBalance">Sizda: 0 🪙</div>
+      </div>
     </div>
-    <div class="err" id="codeErr"></div>
-    <div class="link-row">
-      <button class="ghost-btn" onclick="enterApp()">📊 Asosiy sahifaga kirish</button>
-      <button class="ghost-btn" onclick="showScreen('adminLoginScreen')">⚙️ Admin panel</button>
+    <button class="modal-confirm" onclick="confirmPay()">🪙 Sotib olish</button>
+    <button class="modal-cancel" onclick="closeModal()">Bekor qilish</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+  SPLASH
+═══════════════════════════════════ -->
+<div class="screen active" id="splashScreen">
+  <div class="splash-bg"></div>
+  <div class="splash-body">
+    <div class="splash-logo-wrap">
+      <div class="splash-ring"></div>
+      <span class="splash-logo">🎓</span>
+    </div>
+    <div class="splash-title">Sert<span>Test</span></div>
+    <div class="splash-sub">Milliy sertifikat tizimi<br>Rasch modeli · Reyting · Mukofotlar</div>
+    <div class="splash-card">
+      <div class="lbl">Test kodi</div>
+      <div class="inp-row">
+        <input class="inp" id="codeInp" type="text" placeholder="XXXX" maxlength="12" autocomplete="off"/>
+        <button class="primary-btn" onclick="handleCode()">→</button>
+      </div>
+      <div class="err" id="codeErr"></div>
+      <div class="splash-links">
+        <button class="ghost-btn" onclick="goApp()">📊 Bosh sahifaga kirish</button>
+        <button class="ghost-btn" onclick="push('adminLoginScreen')">⚙️ Admin panel</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ ADMIN LOGIN ═══ -->
-<div id="adminLoginScreen" class="screen">
-  <div class="splash-logo" style="font-size:44px">⚙️</div>
-  <div class="splash-title" style="font-size:22px">Admin Panel</div>
-  <div class="splash-sub">Admin parolini kiriting</div>
-  <div class="splash-card">
-    <div class="inp-lbl">Parol</div>
-    <div class="inp-row">
-      <input class="inp" id="adminPass" type="password" placeholder="••••" maxlength="30" autocomplete="off"/>
-      <button class="go-btn" onclick="checkAdmin()">→</button>
-    </div>
-    <div class="err" id="adminErr"></div>
-    <div class="link-row">
-      <button class="ghost-btn" onclick="showScreen('splash')">← Orqaga</button>
+<!-- ═══════════════════════════════════
+  ADMIN LOGIN
+═══════════════════════════════════ -->
+<div class="screen" id="adminLoginScreen">
+  <div class="hdr">
+    <div class="hdr-back" onclick="pop()">←</div>
+    <div class="hdr-info"><div class="hdr-title">Admin Panel</div></div>
+  </div>
+  <div class="scroll-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;padding:24px;">
+    <div style="font-size:52px;margin-bottom:16px">⚙️</div>
+    <div style="font-size:18px;font-weight:800;margin-bottom:20px;">Admin parolini kiriting</div>
+    <div style="width:100%;max-width:340px;">
+      <div class="lbl">Parol</div>
+      <div class="inp-row">
+        <input class="inp" id="adminPass" type="password" placeholder="••••" maxlength="30" style="letter-spacing:4px"/>
+        <button class="primary-btn" onclick="checkAdmin()">→</button>
+      </div>
+      <div class="err" id="adminErr"></div>
     </div>
   </div>
 </div>
 
-<!-- ═══ ADMIN PANEL ═══ -->
-<div id="adminScreen" class="screen">
-  <div class="admin-top">
-    <div class="at-title">⚙️ Admin Panel</div>
-    <button class="at-back" onclick="showScreen('splash')">← Chiqish</button>
-  </div>
-
-  <div class="asec">
-    <h3>Test kodi</h3>
-    <div class="a-inp-row">
-      <input class="a-inp" id="adminCode" placeholder="Test kodi" maxlength="12"/>
-      <button class="a-sv" onclick="adminSaveCode()">Saqlash</button>
-    </div>
-    <div style="font-size:12px;color:var(--muted);padding-bottom:4px">
-      Joriy: <span id="curCode" style="color:var(--acc);font-weight:700">—</span>
+<!-- ═══════════════════════════════════
+  ADMIN PANEL
+═══════════════════════════════════ -->
+<div class="screen" id="adminScreen">
+  <div class="hdr">
+    <div class="hdr-back" onclick="pop()">←</div>
+    <div class="hdr-info"><div class="hdr-title">⚙️ Admin Panel</div><div class="hdr-sub" id="adminSubLbl">—</div></div>
+    <div class="hdr-right">
+      <button class="a-sv" onclick="adminSaveAll()">💾 Saqlash</button>
     </div>
   </div>
-  <div class="div"></div>
-
-  <div class="asec">
-    <h3>Savol qiyinliklari — Rasch b parametri</h3>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
-      <b style="color:#f7c44f">−2.0</b> = juda oson &nbsp;·&nbsp;
-      <b style="color:var(--acc3)">0.0</b> = o'rtacha &nbsp;·&nbsp;
-      <b style="color:var(--acc2)">+2.0</b> = juda qiyin<br>
-      <span style="color:#888">Agar belgilanmasa, barcha savollar b=0 deb qabul qilinadi</span>
+  <div class="scroll-body">
+    <div class="a-sec">
+      <h3>Test kodi va narxi</h3>
+      <div class="a-row">
+        <input class="a-inp" id="aCode" placeholder="Test kodi" maxlength="12"/>
+        <input class="a-inp" id="aPrice" placeholder="Narx 🪙" type="number" min="0" style="max-width:90px;letter-spacing:0"/>
+        <button class="a-sv" onclick="adminSaveCode()">✓</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);padding-bottom:4px">
+        Kod: <span id="curCode" style="color:var(--acc);font-weight:700">—</span> &nbsp;·&nbsp;
+        Narx: <span id="curPrice" style="color:var(--coin);font-weight:700">—</span> 🪙
+      </div>
     </div>
-    <div class="diff-grid" id="diffGrid"></div>
-  </div>
-  <div class="div"></div>
+    <div class="adiv"></div>
 
-  <div class="asec">
-    <h3>To'g'ri javoblar: 1–32 (ABCD)</h3>
-    <div class="a-grid" id="aGrid1"></div>
-  </div>
-  <div class="div"></div>
+    <div class="a-sec">
+      <h3>Rasch b parametrlari (qiyinlik)</h3>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+        <b style="color:var(--yellow)">-2</b> = oson &nbsp;·&nbsp; <b style="color:var(--green)">0</b> = o'rtacha &nbsp;·&nbsp; <b style="color:var(--red)">+2</b> = qiyin
+      </div>
+      <div class="diff-grid" id="diffGrid"></div>
+    </div>
+    <div class="adiv"></div>
 
-  <div class="asec">
-    <h3>To'g'ri javoblar: 33–35 (ABCDEF)</h3>
-    <div class="a-grid" id="aGrid2"></div>
-  </div>
-  <div class="div"></div>
+    <div class="a-sec">
+      <h3>To'g'ri javoblar — 1–32 (ABCD)</h3>
+      <div class="a-qgrid" id="ag1"></div>
+    </div>
+    <div class="adiv"></div>
 
-  <div class="asec">
-    <h3>Yozma javob kalitlari: 36–45</h3>
-    <div id="aWritten"></div>
-  </div>
+    <div class="a-sec">
+      <h3>To'g'ri javoblar — 33–35 (ABCDEF)</h3>
+      <div class="a-qgrid" id="ag2"></div>
+    </div>
+    <div class="adiv"></div>
 
-  <div style="padding:13px 13px 32px">
-    <button class="a-sv" style="width:100%;padding:13px;font-size:14px;border-radius:var(--r)" onclick="adminSaveAll()">
-      💾 Barcha sozlamalarni saqlash
-    </button>
+    <div class="a-sec">
+      <h3>Yozma javob kalitlari — 36–45</h3>
+      <div id="agW"></div>
+    </div>
+    <div style="padding:14px 14px 40px">
+      <button class="a-sv" style="width:100%;padding:13px;font-size:14px;border-radius:var(--r)" onclick="adminSaveAll()">
+        💾 Barcha sozlamalarni saqlash
+      </button>
+    </div>
   </div>
 </div>
 
-<!-- ═══ MAIN APP ═══ -->
-<div id="appScreen" class="screen">
+<!-- ═══════════════════════════════════
+  MAIN APP
+═══════════════════════════════════ -->
+<div class="screen" id="appScreen">
   <!-- Bottom Nav -->
   <div class="bnav">
-    <div class="bnav-item active" onclick="switchPage('dashPage',this)" id="nav-dash">
-      <div class="bnav-icon">🏠</div>
-      <div class="bnav-lbl">Bosh sahifa</div>
+    <div class="bn-item active" id="nav0" onclick="switchTab(0)">
+      <div class="bn-dot"></div><div class="bn-ic">🏠</div><div class="bn-lbl">Asosiy</div>
     </div>
-    <div class="bnav-item" onclick="switchPage('testsPage',this)" id="nav-tests">
-      <div class="bnav-icon">📝</div>
-      <div class="bnav-lbl">Testlar</div>
+    <div class="bn-item" id="nav1" onclick="switchTab(1)">
+      <div class="bn-dot"></div><div class="bn-ic">🏆</div><div class="bn-lbl">Reyting</div>
     </div>
-    <div class="bnav-item" onclick="switchPage('histPage',this)" id="nav-hist">
-      <div class="bnav-icon">📊</div>
-      <div class="bnav-lbl">Natijalar</div>
+    <div class="bn-item" id="nav2" onclick="switchTab(2)">
+      <div class="bn-dot"></div><div class="bn-ic">📊</div><div class="bn-lbl">Natijalar</div>
     </div>
-    <div class="bnav-item" onclick="switchPage('profPage',this)" id="nav-prof">
-      <div class="bnav-icon">👤</div>
-      <div class="bnav-lbl">Profil</div>
+    <div class="bn-item" id="nav3" onclick="switchTab(3)">
+      <div class="bn-dot"></div><div class="bn-ic">🪙</div><div class="bn-lbl">Do'kon</div>
+    </div>
+    <div class="bn-item" id="nav4" onclick="switchTab(4)">
+      <div class="bn-dot"></div><div class="bn-ic">👤</div><div class="bn-lbl">Profil</div>
     </div>
   </div>
 
-  <!-- ── DASHBOARD ── -->
-  <div id="dashPage" class="page active">
-    <div class="top-bar">
-      <div>
-        <div class="top-title">Bosh sahifa</div>
-        <div class="top-sub" id="dashDate">—</div>
+  <!-- TAB 0: DASHBOARD -->
+  <div class="page active scroll-body with-nav" id="tab0">
+    <div class="hdr" style="position:sticky;top:0;z-index:5;">
+      <div class="hdr-info"><div class="hdr-title">SertTest Pro</div><div class="hdr-sub" id="dashDate">—</div></div>
+      <div class="hdr-right">
+        <div class="coin-badge" onclick="switchTab(3)">
+          <span class="ic">🪙</span><span class="amt" id="coinAmt">0</span>
+        </div>
       </div>
-      <div class="top-badge" id="dashBadge">—</div>
     </div>
     <div class="dash-hero">
-      <div class="hero-greeting">Xush kelibsiz 👋</div>
-      <div class="hero-name" id="heroName">Ishtirokchi</div>
-      <div class="stats-grid" id="dashStats"></div>
+      <div class="dh-greeting">Xush kelibsiz 👋</div>
+      <div class="dh-name" id="heroName">Ishtirokchi</div>
+      <div class="kpi-row" id="kpiRow"></div>
     </div>
-
-    <div id="activTestWrap" style="display:none">
-      <div class="section-title">Faol test</div>
-      <div class="active-test-card" id="activeTestCard" onclick="goActiveTest()">
-        <div class="atc-lbl">Hozir mavjud</div>
-        <div class="atc-code" id="atcCode">—</div>
-        <div class="atc-sub">45 savol · ABCD + ABCDEF + Yozma</div>
-        <div class="atc-arrow">▶ Boshlash →</div>
-      </div>
+    <div id="testBannerWrap"></div>
+    <div class="sec-lbl" id="recentSec" style="display:none">
+      So'nggi natijalar <a onclick="switchTab(2)">Barchasini ko'r →</a>
     </div>
-
-    <div id="bestBandWrap" style="display:none">
-      <div class="section-title">Eng yaxshi natija</div>
-      <div class="cert-strip" id="bestBand" style="margin:0 16px 20px"></div>
-    </div>
-
-    <div id="recentWrap" style="display:none">
-      <div class="section-title">So'nggi natijalar</div>
-      <div class="result-list" id="recentList"></div>
-    </div>
+    <div class="results-list" id="recentList"></div>
   </div>
 
-  <!-- ── TESTS PAGE ── -->
-  <div id="testsPage" class="page">
-    <div class="top-bar">
-      <div>
-        <div class="top-title">Testlar</div>
-        <div class="top-sub">Faol testlar ro'yxati</div>
-      </div>
+  <!-- TAB 1: LEADERBOARD -->
+  <div class="page scroll-body with-nav" id="tab1">
+    <div class="hdr" style="position:sticky;top:0;z-index:5;">
+      <div class="hdr-info"><div class="hdr-title">🏆 Reyting</div><div class="hdr-sub">Rasch θ asosida hisoblangan</div></div>
     </div>
-    <div class="tests-wrap" id="testsWrap"></div>
+    <div class="leader-wrap" id="leaderWrap"></div>
   </div>
 
-  <!-- ── HISTORY PAGE ── -->
-  <div id="histPage" class="page">
-    <div class="top-bar">
-      <div>
-        <div class="top-title">Natijalar tarixi</div>
-        <div class="top-sub">Barcha urinishlar</div>
-      </div>
+  <!-- TAB 2: RESULTS -->
+  <div class="page scroll-body with-nav" id="tab2">
+    <div class="hdr" style="position:sticky;top:0;z-index:5;">
+      <div class="hdr-info"><div class="hdr-title">📊 Mening natijalarim</div></div>
     </div>
-    <div class="hist-wrap" id="histWrap"></div>
+    <div class="hist-list" id="histList"></div>
   </div>
 
-  <!-- ── PROFILE PAGE ── -->
-  <div id="profPage" class="page">
-    <div class="top-bar">
-      <div class="top-title">Profil</div>
+  <!-- TAB 3: SHOP -->
+  <div class="page scroll-body with-nav" id="tab3">
+    <div class="hdr" style="position:sticky;top:0;z-index:5;">
+      <div class="hdr-info"><div class="hdr-title">🪙 Moneta do'koni</div></div>
+      <div class="hdr-right"><div class="coin-badge"><span class="ic">🪙</span><span class="amt" id="shopCoin">0</span></div></div>
+    </div>
+    <div class="shop-hero">
+      <div class="shop-balance">
+        <div class="sb-lbl">Balansingiz:</div>
+        <div class="sb-val" id="shopBal">0</div>
+        <div class="sb-lbl">🪙</div>
+      </div>
+    </div>
+    <div class="sec-lbl">Paketlar</div>
+    <div class="shop-grid" id="shopGrid"></div>
+    <div class="sec-lbl">Test kirish</div>
+    <div style="padding:0 16px 32px" id="testShopWrap"></div>
+  </div>
+
+  <!-- TAB 4: PROFILE -->
+  <div class="page scroll-body with-nav" id="tab4">
+    <div class="hdr" style="position:sticky;top:0;z-index:5;">
+      <div class="hdr-info"><div class="hdr-title">👤 Profil</div></div>
     </div>
     <div class="prof-wrap" id="profWrap"></div>
   </div>
 </div>
 
-<!-- ═══ TEST TAKING ═══ -->
-<div id="testScreen" class="screen">
-  <div class="test-header">
-    <div class="th-row">
-      <div class="th-title" id="testTitle">Test</div>
-      <button class="th-close" onclick="closeTest()">✕ Yopish</button>
-    </div>
-    <div class="th-chips">
-      <div class="th-chip">Savollar: <span>45</span></div>
-      <div class="th-chip">To'ldirilgan: <span id="filled">0</span></div>
+<!-- ═══════════════════════════════════
+  TEST SCREEN
+═══════════════════════════════════ -->
+<div class="screen" id="testScreen">
+  <div class="hdr" style="flex-shrink:0;">
+    <div class="hdr-back" onclick="confirmCloseTest()">←</div>
+    <div class="hdr-info"><div class="hdr-title" id="testTitle">Test</div></div>
+    <div class="hdr-right">
+      <div class="th-chip" style="background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--muted)">
+        <span id="filled">0</span>/45
+      </div>
     </div>
   </div>
-
-  <div class="swrap">
-    <div class="shdr">
-      <div class="sdot" style="background:#4f8ef7;box-shadow:0 0 8px #4f8ef788"></div>
-      <div class="slbl" style="color:#4f8ef7">A / B / C / D</div>
-      <div class="srng">1 – 32</div>
+  <div class="test-prog-bar"><div class="test-prog-fill" id="tProg" style="width:0%"></div></div>
+  <div class="scroll-body" id="testBody">
+    <div class="q-section">
+      <div class="qs-hdr">
+        <div class="qs-dot" style="background:#5b6ef7;box-shadow:0 0 8px #5b6ef788"></div>
+        <div class="qs-lbl" style="color:#5b6ef7">A / B / C / D</div>
+        <div class="qs-rng">1 – 32</div>
+      </div>
+      <div class="q-list" id="g1"></div>
     </div>
-    <div class="q-grid" id="g1"></div>
-  </div>
-  <div class="divider"></div>
-  <div class="swrap">
-    <div class="shdr">
-      <div class="sdot" style="background:#4fd984;box-shadow:0 0 8px #4fd98488"></div>
-      <div class="slbl" style="color:#4fd984">A / B / C / D / E / F</div>
-      <div class="srng">33 – 35</div>
+    <div class="div"></div>
+    <div class="q-section">
+      <div class="qs-hdr">
+        <div class="qs-dot" style="background:#22d37a;box-shadow:0 0 8px #22d37a88"></div>
+        <div class="qs-lbl" style="color:#22d37a">A / B / C / D / E / F</div>
+        <div class="qs-rng">33 – 35</div>
+      </div>
+      <div class="q-list" id="g2"></div>
     </div>
-    <div class="q-grid" id="g2"></div>
-  </div>
-  <div class="divider"></div>
-  <div class="swrap">
-    <div class="shdr">
-      <div class="sdot" style="background:#f7614f;box-shadow:0 0 8px #f7614f88"></div>
-      <div class="slbl" style="color:#f7614f">Yozma javob</div>
-      <div class="srng">36 – 45</div>
+    <div class="div"></div>
+    <div class="q-section">
+      <div class="qs-hdr">
+        <div class="qs-dot" style="background:#f05c5c;box-shadow:0 0 8px #f05c5c88"></div>
+        <div class="qs-lbl" style="color:#f05c5c">Yozma javob</div>
+        <div class="qs-rng">36 – 45</div>
+      </div>
+      <div class="w-list" id="g3"></div>
     </div>
-    <div class="w-grid" id="g3"></div>
-  </div>
-  <div class="sub-area">
-    <div class="p-wrap"><div class="p-fill" id="pFill" style="width:0%"></div></div>
-    <div class="p-lbl" id="pLbl">0 / 45 to'ldirilgan</div>
-    <button class="sub-btn" onclick="submitTest()">✅ Natijani ko'rish</button>
+    <div class="test-footer">
+      <div class="p-bar"><div class="p-fill" id="pFill" style="width:0%"></div></div>
+      <div class="p-lbl" id="pLbl">0 / 45 to'ldirilgan</div>
+      <button class="submit-btn" onclick="submitTest()">✅ Natijani ko'rish</button>
+    </div>
   </div>
 </div>
 
-<!-- ═══ RESULT DETAIL ═══ -->
-<div id="resultDetailScreen" class="screen">
-  <div class="top-bar">
-    <div class="top-title">Natija</div>
-    <button class="at-back" onclick="backFromResult()">← Orqaga</button>
-  </div>
-  <div class="res-hero">
-    <div class="res-grade-wrap">
-      <div class="res-grade-ring" id="rGradeRing">—</div>
-      <div class="res-grade-name" id="rGradeName">—</div>
-    </div>
-    <div class="res-score-big" id="rScore">0</div>
-    <div class="res-score-sub" id="rScoreSub">ball</div>
-  </div>
-
-  <div class="theta-card">
-    <div class="theta-ic">🧠</div>
-    <div>
-      <div class="theta-lbl">Rasch θ · Qobiliyat darajasi</div>
-      <div class="theta-val" id="rTheta">—</div>
-      <div class="theta-desc" id="rThetaDesc">—</div>
+<!-- ═══════════════════════════════════
+  RESULT SCREEN
+═══════════════════════════════════ -->
+<div class="screen" id="resultScreen">
+  <div class="hdr" style="flex-shrink:0;">
+    <div class="hdr-back" onclick="pop()">←</div>
+    <div class="hdr-info"><div class="hdr-title">Natija</div></div>
+    <div class="hdr-right">
+      <button class="a-sv" style="font-size:12px;padding:7px 12px" onclick="retryTest()">🔄 Qayta</button>
     </div>
   </div>
-
-  <div class="res-stats">
-    <div class="rs-box rs-c"><div class="rs-num" id="rC">0</div><div class="rs-lbl">✅ To'g'ri</div></div>
-    <div class="rs-box rs-w"><div class="rs-num" id="rW">0</div><div class="rs-lbl">❌ Noto'g'ri</div></div>
-    <div class="rs-box rs-e"><div class="rs-num" id="rE">0</div><div class="rs-lbl">⬜ Bo'sh</div></div>
-  </div>
-
-  <div class="breakdown">
-    <div class="bk-ttl">Bo'limlar bo'yicha</div>
-    <div class="bk-row">
-      <div class="bk-lbl">1–32 (ABCD)</div>
-      <div class="bk-bw"><div class="bk-bf" id="bk1" style="background:#4f8ef7;width:0%"></div></div>
-      <div class="bk-pct" id="bk1p" style="color:#4f8ef7">0%</div>
+  <div class="scroll-body">
+    <div class="res-hero">
+      <div class="grade-ring-wrap">
+        <div class="grade-glow" id="rGlow"></div>
+        <div class="grade-ring" id="rRing">—</div>
+      </div>
+      <div class="grade-name" id="rGradeName">—</div>
+      <div class="big-score" id="rScore">0</div>
+      <div class="big-score-sub" id="rScoreSub">ball</div>
     </div>
-    <div class="bk-row">
-      <div class="bk-lbl">33–35 (ABCDEF)</div>
-      <div class="bk-bw"><div class="bk-bf" id="bk2" style="background:#4fd984;width:0%"></div></div>
-      <div class="bk-pct" id="bk2p" style="color:#4fd984">0%</div>
+    <div class="theta-card">
+      <div class="theta-ic">🧠</div>
+      <div>
+        <div class="theta-lbl">Rasch θ · Qobiliyat darajasi</div>
+        <div class="theta-val" id="rTheta">—</div>
+        <div class="theta-desc" id="rThetaDesc">—</div>
+      </div>
     </div>
-    <div class="bk-row">
-      <div class="bk-lbl">36–45 (Yozma)</div>
-      <div class="bk-bw"><div class="bk-bf" id="bk3" style="background:#f7614f;width:0%"></div></div>
-      <div class="bk-pct" id="bk3p" style="color:#f7614f">0%</div>
+    <div class="s-row">
+      <div class="s-box"><div class="s-num" id="rC" style="color:var(--green)">0</div><div class="s-lbl">✅ To'g'ri</div></div>
+      <div class="s-box"><div class="s-num" id="rW" style="color:var(--red)">0</div><div class="s-lbl">❌ Noto'g'ri</div></div>
+      <div class="s-box"><div class="s-num" id="rE" style="color:var(--yellow)">0</div><div class="s-lbl">⬜ Bo'sh</div></div>
     </div>
-  </div>
-
-  <div class="cert-card" id="rCertCard">
-    <div class="cc-badge" id="rCertIcon">🏅</div>
-    <div class="cc-title" id="rCertTitle">—</div>
-    <div class="cc-sub" id="rCertSub">—</div>
-  </div>
-
-  <div class="res-actions">
-    <button class="det-btn" onclick="showAnswerDetail()">📋 Javoblarni ko'rish</button>
-    <button class="retry-btn" onclick="retryTest()">🔄 Qayta urinish</button>
-    <button class="det-btn" onclick="backFromResult()" style="margin-top:4px">← Bosh sahifaga qaytish</button>
+    <div class="bk">
+      <div class="bk-ttl">Bo'limlar bo'yicha</div>
+      <div class="bk-row"><div class="bk-l">1–32 (ABCD)</div><div class="bk-bw"><div class="bk-bf" id="bk1" style="background:#5b6ef7;width:0%"></div></div><div class="bk-p" id="bk1p" style="color:#5b6ef7">0%</div></div>
+      <div class="bk-row"><div class="bk-l">33–35 (ABCDEF)</div><div class="bk-bw"><div class="bk-bf" id="bk2" style="background:#22d37a;width:0%"></div></div><div class="bk-p" id="bk2p" style="color:#22d37a">0%</div></div>
+      <div class="bk-row"><div class="bk-l">36–45 (Yozma)</div><div class="bk-bw"><div class="bk-bf" id="bk3" style="background:#f05c5c;width:0%"></div></div><div class="bk-p" id="bk3p" style="color:#f05c5c">0%</div></div>
+    </div>
+    <div class="cert-card" id="rCert"></div>
+    <div class="coin-reward" id="rCoinReward" style="display:none">
+      <div class="cr-icon">🪙</div>
+      <div><div class="cr-title" id="crTitle">+25 moneta yutdingiz!</div><div class="cr-sub" id="crSub">Yuqori ball uchun bonus</div></div>
+    </div>
+    <div class="res-actions">
+      <button class="sec-btn" onclick="showAnswers()">📋 Javoblarni ko'rish</button>
+      <button class="sec-btn" onclick="pop();switchTab(1)">🏆 Reytingni ko'rish</button>
+      <button class="ret-btn" onclick="retryTest()">🔄 Qayta urinish</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- ══════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════
+   JAVASCRIPT
+══════════════════════════════════════ -->
 <script>
-// ──────────────────────────────────────────
-// CONSTANTS & CONFIG
-// ──────────────────────────────────────────
-const ADMIN_PASSWORD = 'admin123'; // ← o'zgartiring
+// ════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════
+const ADMIN_PASSWORD = 'admin123';
 
-// Daraja shkalasi (100 ballik)
 const BANDS = [
-  { min:70, grade:'A+', color:'#4fd984', bg:'#4fd98415', cert:'Oltin sertifikat 🥇',   icon:'🥇', lbl:'Mukammal' },
-  { min:65, grade:'A',  color:'#4fd984', bg:'#4fd98415', cert:'Oltin sertifikat 🥇',   icon:'🥇', lbl:"A'lo" },
-  { min:60, grade:'B+', color:'#4f8ef7', bg:'#4f8ef715', cert:'Kumush sertifikat 🥈',  icon:'🥈', lbl:'Yaxshi+' },
-  { min:54, grade:'B',  color:'#4f8ef7', bg:'#4f8ef715', cert:'Kumush sertifikat 🥈',  icon:'🥈', lbl:'Yaxshi' },
-  { min:50, grade:'C+', color:'#f7c44f', bg:'#f7c44f15', cert:'Bronza sertifikat 🥉',  icon:'🥉', lbl:'Qoniqarli+' },
-  { min:46, grade:'C',  color:'#f7c44f', bg:'#f7c44f15', cert:'Bronza sertifikat 🥉',  icon:'🥉', lbl:'Qoniqarli' },
-  { min:0,  grade:'F',  color:'#f7614f', bg:'#f7614f15', cert:'Sertifikat berilmaydi', icon:'❌', lbl:'Qoniqarsiz' },
+  {min:70,grade:'A+',color:'#22d37a',bg:'#22d37a15',cert:'Oltin sertifikat',icon:'🥇',lbl:'Mukammal'},
+  {min:65,grade:'A', color:'#22d37a',bg:'#22d37a15',cert:'Oltin sertifikat',icon:'🥇',lbl:"A'lo"},
+  {min:60,grade:'B+',color:'#5b6ef5',bg:'#5b6ef515',cert:'Kumush sertifikat',icon:'🥈',lbl:'Yaxshi+'},
+  {min:54,grade:'B', color:'#5b6ef5',bg:'#5b6ef515',cert:'Kumush sertifikat',icon:'🥈',lbl:'Yaxshi'},
+  {min:50,grade:'C+',color:'#f0b429',bg:'#f0b42915',cert:'Bronza sertifikat',icon:'🥉',lbl:'Qoniqarli+'},
+  {min:46,grade:'C', color:'#f0b429',bg:'#f0b42915',cert:'Bronza sertifikat',icon:'🥉',lbl:'Qoniqarli'},
+  {min:0, grade:'F', color:'#f05c5c',bg:'#f05c5c15',cert:'Sertifikat berilmaydi',icon:'❌',lbl:'Qoniqarsiz'},
 ];
 
-// Ballash tizimi (milliy sertifikat)
-// 1-32: 1 ball, 33-35: 2 ball, 36-45 a+b: 0.7+0.7=1.4 ball per q
-const RAW_MAX = 32 + 6 + 14; // 52
+const COIN_PACKAGES = [
+  {id:'p50',  name:'Starter',  ic:'🪙',coins:50,  price:'Bepul',  free:true, desc:'Yangi foydalanuvchi bonusi'},
+  {id:'p100', name:'Basic',    ic:'💰',coins:100, price:'5 000 so\'m', desc:'Eng ko\'p sotib olinadi'},
+  {id:'p250', name:'Pro',      ic:'💎',coins:250, price:'10 000 so\'m',desc:'25% tejamkorlik'},
+  {id:'p600', name:'Premium',  ic:'👑',coins:600, price:'20 000 so\'m',desc:'50% tejamkorlik'},
+];
 
-// ──────────────────────────────────────────
-// PERSISTENT STORAGE (shared across users)
-// ──────────────────────────────────────────
-const ADMIN_KEY    = 'adminConfig';    // shared: test config set by admin
-const RESULTS_KEY  = 'allResults';     // shared: all user results
-const PROFILE_KEY  = 'userProfile';    // personal: per-user profile
+const RAW_MAX = 52; // 32 + 6 + 14
 
-async function storageGet(key, shared=false){
-  try{
-    const r=await window.storage.get(key,shared);
-    return r?JSON.parse(r.value):null;
-  }catch{return null;}
+// ════════════════════════════════════════
+//  NAVIGATION STACK
+// ════════════════════════════════════════
+const navStack = ['splashScreen'];
+
+function push(screenId){
+  const prev = navStack[navStack.length-1];
+  if(prev === screenId) return;
+  // mark prev as prev
+  document.getElementById(prev)?.classList.add('prev');
+  document.getElementById(prev)?.classList.remove('active');
+  navStack.push(screenId);
+  const el = document.getElementById(screenId);
+  el.classList.add('active');
+  el.classList.remove('prev');
 }
-async function storageSet(key,val,shared=false){
-  try{await window.storage.set(key,JSON.stringify(val),shared);}catch{}
+
+function pop(){
+  if(navStack.length<=1) return;
+  const cur = navStack.pop();
+  const curEl = document.getElementById(cur);
+  curEl.classList.remove('active');
+  curEl.classList.add('prev');
+  setTimeout(()=>curEl.classList.remove('prev'),350);
+  const prev = navStack[navStack.length-1];
+  document.getElementById(prev)?.classList.add('active');
+  document.getElementById(prev)?.classList.remove('prev');
 }
 
-// ──────────────────────────────────────────
-// STATE
-// ──────────────────────────────────────────
+function goApp(){
+  push('appScreen');
+  renderDash();renderLeader();renderHistory();renderShop();renderProfile();
+}
+
+// ════════════════════════════════════════
+//  STORAGE
+// ════════════════════════════════════════
+const CFG_KEY  = 'sertTestCfg';
+const RES_KEY  = 'sertTestResults';
+const PROF_KEY = 'sertTestProfile';
+
+async function sGet(k,shared=false){
+  try{const r=await window.storage.get(k,shared);return r?JSON.parse(r.value):null;}catch{return null;}
+}
+async function sSet(k,v,shared=false){
+  try{await window.storage.set(k,JSON.stringify(v),shared);}catch{}
+}
+
+// ════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════
 const tg = window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
 
-let adminConfig = { testCode:'', answers:{}, diff:{} };
-let allResults  = []; // [{id,userId,userName,code,date,scaled,raw,theta,grade,correct,wrong,empty,c1,c2,c3}]
-let userProfile = { name:'Ishtirokchi', userId:'', attempts:0 };
+let cfg     = {testCode:'',testPrice:0,answers:{},diff:{}};
+let results = [];   // shared — all users
+let profile = {userId:'',name:'Foydalanuvchi',coins:0,attempts:0,boughtTests:[]};
 let userAnswers = {};
+let activeTestCode = '';
+let pendingPayCode = '';
 let currentResult = null;
-let fromDetail = false;
 
-// ──────────────────────────────────────────
-// INIT
-// ──────────────────────────────────────────
-async function init(){
-  // Load shared admin config
-  const ac = await storageGet(ADMIN_KEY, true);
-  if(ac) adminConfig = ac;
+async function boot(){
+  const c=await sGet(CFG_KEY,true);   if(c) cfg=c;
+  const r=await sGet(RES_KEY,true);   if(r) results=r;
+  const p=await sGet(PROF_KEY,false); if(p) profile=p;
 
-  // Load all results (shared)
-  const ar = await storageGet(RESULTS_KEY, true);
-  if(ar) allResults = ar;
-
-  // Load personal profile
-  const up = await storageGet(PROFILE_KEY, false);
-  if(up) userProfile = up;
-
-  // Get Telegram user info
   if(tg?.initDataUnsafe?.user){
-    const u = tg.initDataUnsafe.user;
-    userProfile.userId   = String(u.id||'');
-    userProfile.name     = u.first_name + (u.last_name?' '+u.last_name:'');
-    await storageSet(PROFILE_KEY, userProfile, false);
+    const u=tg.initDataUnsafe.user;
+    profile.userId = String(u.id||'tg_'+Date.now());
+    profile.name   = [u.first_name,u.last_name].filter(Boolean).join(' ') || 'Foydalanuvchi';
+  } else if(!profile.userId){
+    profile.userId = 'user_'+Date.now();
   }
+
+  // Give 50 coins to new users
+  if(profile.coins===undefined||profile.coins===null){
+    profile.coins=50;
+    showToast('🎉 Xush kelibsiz! 50 🪙 sovg\'a!');
+  }
+
+  await sSet(PROF_KEY,profile,false);
+  updateCoinUI();
 }
+boot();
 
-init();
-
-// ──────────────────────────────────────────
-// SCREEN NAV
-// ──────────────────────────────────────────
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function switchPage(pageId, navEl){
+// ════════════════════════════════════════
+//  TABS
+// ════════════════════════════════════════
+let curTab=0;
+function switchTab(i){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.bnav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-  navEl.classList.add('active');
-  if(pageId==='dashPage')  renderDashboard();
-  if(pageId==='testsPage') renderTests();
-  if(pageId==='histPage')  renderHistory();
-  if(pageId==='profPage')  renderProfile();
+  document.querySelectorAll('.bn-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`tab${i}`).classList.add('active');
+  document.getElementById(`nav${i}`).classList.add('active');
+  curTab=i;
+  if(i===0) renderDash();
+  if(i===1) renderLeader();
+  if(i===2) renderHistory();
+  if(i===3) renderShop();
+  if(i===4) renderProfile();
 }
 
-async function enterApp(){
-  showScreen('appScreen');
-  renderDashboard();
-  renderTests();
-  renderHistory();
-  renderProfile();
-}
+// ════════════════════════════════════════
+//  SPLASH HANDLER
+// ════════════════════════════════════════
+async function handleCode(){
+  const code = document.getElementById('codeInp').value.trim().toUpperCase();
+  if(!code){showE('codeErr','Kodni kiriting!');return;}
 
-// ──────────────────────────────────────────
-// ADMIN
-// ──────────────────────────────────────────
-function checkAdmin(){
-  if(document.getElementById('adminPass').value!==ADMIN_PASSWORD){
-    showErr('adminErr','❌ Noto\'g\'ri parol!');return;
-  }
-  document.getElementById('adminErr').style.display='none';
-  document.getElementById('adminPass').value='';
-  buildAdminPanel();
-  showScreen('adminScreen');
-}
-document.getElementById('adminPass').addEventListener('keydown',e=>{if(e.key==='Enter')checkAdmin();});
+  // reload cfg
+  const c=await sGet(CFG_KEY,true); if(c) cfg=c;
 
-function buildAdminPanel(){
-  document.getElementById('adminCode').value = adminConfig.testCode||'';
-  document.getElementById('curCode').textContent = adminConfig.testCode||'(yo\'q)';
-
-  // Difficulty grid
-  const dg = document.getElementById('diffGrid');
-  dg.innerHTML='';
-  for(let i=1;i<=35;i++){
-    const c=document.createElement('div');
-    c.className='diff-cell';
-    c.innerHTML=`<div class="diff-num">${i}</div>
-      <input class="diff-val" id="dv-${i}" type="number" step="0.1" min="-3" max="3"
-        value="${adminConfig.diff[i]!==undefined?adminConfig.diff[i]:0}"/>`;
-    dg.appendChild(c);
-  }
-
-  // Answer grids
-  buildAGrid('aGrid1',1,32,['A','B','C','D']);
-  buildAGrid('aGrid2',33,35,['A','B','C','D','E','F']);
-  buildAWritten();
-}
-
-function buildAGrid(gridId,from,to,opts){
-  const g=document.getElementById(gridId); g.innerHTML='';
-  for(let i=from;i<=to;i++){
-    const row=document.createElement('div'); row.className='a-row';
-    row.innerHTML=`<div class="a-num">${i}</div><div class="a-opts" id="ao-${i}"></div>`;
-    g.appendChild(row);
-    const or=row.querySelector('.a-opts');
-    opts.forEach(o=>{
-      const b=document.createElement('button');
-      b.className='a-ob'+(adminConfig.answers[i]===o?` sel-${o}`:'');
-      b.textContent=o;
-      b.onclick=()=>{or.querySelectorAll('.a-ob').forEach(x=>x.className='a-ob');b.classList.add(`sel-${o}`);adminConfig.answers[i]=o;};
-      or.appendChild(b);
-    });
-  }
-}
-
-function buildAWritten(){
-  const g=document.getElementById('aWritten'); g.innerHTML='';
-  for(let i=36;i<=45;i++){
-    const d=document.createElement('div'); d.className='wk-row';
-    d.innerHTML=`<div class="wk-lbl">${i}-savol kalit so'zlari</div>
-      <div class="wk-parts">
-        <div class="wk-p"><div class="wk-lbl">a)</div><textarea class="wk-i" id="wk-${i}-a" rows="2">${adminConfig.answers[`${i}-a`]||''}</textarea></div>
-        <div class="wk-p"><div class="wk-lbl">b)</div><textarea class="wk-i" id="wk-${i}-b" rows="2">${adminConfig.answers[`${i}-b`]||''}</textarea></div>
-      </div>`;
-    g.appendChild(d);
-  }
-}
-
-async function adminSaveCode(){
-  adminConfig.testCode = document.getElementById('adminCode').value.trim();
-  await storageSet(ADMIN_KEY, adminConfig, true);
-  document.getElementById('curCode').textContent = adminConfig.testCode||'(yo\'q)';
-  showToast('✅ Kod saqlandi!');
-}
-
-async function adminSaveAll(){
-  adminConfig.testCode = document.getElementById('adminCode').value.trim();
-  for(let i=1;i<=35;i++){
-    const el=document.getElementById(`dv-${i}`);
-    if(el) adminConfig.diff[i]=parseFloat(el.value)||0;
-  }
-  for(let i=36;i<=45;i++){
-    ['a','b'].forEach(p=>{
-      const el=document.getElementById(`wk-${i}-${p}`);
-      if(el) adminConfig.answers[`${i}-${p}`]=el.value.trim();
-    });
-  }
-  await storageSet(ADMIN_KEY, adminConfig, true);
-  document.getElementById('curCode').textContent = adminConfig.testCode||'(yo\'q)';
-  showToast('✅ Barcha sozlamalar saqlandi!');
-}
-
-// ──────────────────────────────────────────
-// START TEST FROM SPLASH
-// ──────────────────────────────────────────
-async function startTest(){
-  // Reload admin config from shared storage
-  const ac = await storageGet(ADMIN_KEY, true);
-  if(ac) adminConfig = ac;
-
-  const code = document.getElementById('codeInput').value.trim().toUpperCase();
-  if(!code){ showErr('codeErr','Kodni kiriting!'); return; }
-  if(adminConfig.testCode && code!==adminConfig.testCode.toUpperCase()){
-    showErr('codeErr','❌ Noto\'g\'ri kod!'); return;
+  if(cfg.testCode && code!==cfg.testCode.toUpperCase()){
+    showE('codeErr','❌ Noto\'g\'ri kod!');return;
   }
   document.getElementById('codeErr').style.display='none';
-  openTest(code);
+  initiateTest(code);
 }
-document.getElementById('codeInput').addEventListener('keydown',e=>{if(e.key==='Enter')startTest();});
+document.getElementById('codeInp').addEventListener('keydown',e=>{if(e.key==='Enter')handleCode();});
+
+// ════════════════════════════════════════
+//  PAYMENT FLOW
+// ════════════════════════════════════════
+function initiateTest(code){
+  const price = cfg.testPrice||0;
+  const bought = profile.boughtTests||[];
+
+  if(price>0 && !bought.includes(code)){
+    // Need to pay
+    pendingPayCode = code;
+    document.getElementById('payTitle').textContent = `📝 ${code} — Testni ochish`;
+    document.getElementById('paySubTitle').textContent = `Bu test uchun ${price} 🪙 to'lov kerak`;
+    document.getElementById('payPrice').textContent = price;
+    document.getElementById('payBalance').textContent = `Sizda: ${profile.coins} 🪙`;
+    openModal();
+  } else {
+    openTestScreen(code);
+  }
+}
+
+function openModal(){document.getElementById('payModal').classList.add('open');}
+function closeModal(){document.getElementById('payModal').classList.remove('open');}
+
+async function confirmPay(){
+  const price = cfg.testPrice||0;
+  if(profile.coins<price){
+    showToast('❌ Yetarli moneta yo\'q! Do\'konga boring.');
+    closeModal();
+    return;
+  }
+  profile.coins -= price;
+  if(!profile.boughtTests) profile.boughtTests=[];
+  profile.boughtTests.push(pendingPayCode);
+  await sSet(PROF_KEY,profile,false);
+  updateCoinUI();
+  closeModal();
+  showToast(`✅ Test sotib olindi! -${price}🪙`);
+  openTestScreen(pendingPayCode);
+}
+
+// ════════════════════════════════════════
+//  OPEN TEST
+// ════════════════════════════════════════
+function openTestScreen(code){
+  activeTestCode = code;
+  document.getElementById('testTitle').textContent = '📝 '+code;
+  buildTest();
+  push('testScreen');
+  document.getElementById('testBody').scrollTop=0;
+}
 
 function goActiveTest(){
-  const code = adminConfig.testCode||'TEST';
-  openTest(code);
+  initiateTest(cfg.testCode||activeTestCode||'TEST');
 }
 
-function openTest(code){
-  document.getElementById('testTitle').textContent = '📝 '+code;
-  buildTestUI();
-  showScreen('testScreen');
-  document.getElementById('testScreen').scrollTop=0;
+function confirmCloseTest(){
+  if(Object.keys(userAnswers).length>0){
+    if(confirm('Testni yopishni xohlaysizmi? Barcha javoblar o\'chadi.')){pop();}
+  } else pop();
 }
 
-function closeTest(){
-  showScreen('appScreen');
-  renderDashboard();
-}
-
-// ──────────────────────────────────────────
-// TEST UI
-// ──────────────────────────────────────────
-function buildTestUI(){
+// ════════════════════════════════════════
+//  BUILD TEST
+// ════════════════════════════════════════
+function buildTest(){
   ['g1','g2','g3'].forEach(id=>document.getElementById(id).innerHTML='');
   Object.keys(userAnswers).forEach(k=>delete userAnswers[k]);
-
   for(let i=1;i<=32;i++) addQRow(i,['A','B','C','D'],'g1');
   for(let i=33;i<=35;i++) addQRow(i,['A','B','C','D','E','F'],'g2');
   for(let i=36;i<=45;i++) addWRow(i);
@@ -815,28 +1151,33 @@ function buildTestUI(){
 function addQRow(i,opts,gid){
   const g=document.getElementById(gid);
   const row=document.createElement('div'); row.className='q-row';
-  row.innerHTML=`<div class="qn">${i}</div><div class="opts" id="opts-${i}"></div>`;
+  row.innerHTML=`<div class="q-num">${i}</div><div class="q-opts" id="opts-${i}"></div>`;
   g.appendChild(row);
-  const or=row.querySelector('.opts');
+  const or=row.querySelector('.q-opts');
   opts.forEach(o=>{
     const b=document.createElement('button');
     b.className='ob'; b.textContent=o; b.id=`ub-${i}-${o}`;
-    b.onclick=()=>{or.querySelectorAll('.ob').forEach(x=>x.className='ob');b.classList.add(`sel-${o}`);userAnswers[i]=o;updateProg();};
+    b.setAttribute('data-opt',o);
+    b.onclick=()=>{
+      or.querySelectorAll('.ob').forEach(x=>{x.className='ob';x.setAttribute('data-opt',x.textContent);});
+      b.classList.add('selected');
+      userAnswers[i]=o; updateProg();
+    };
     or.appendChild(b);
   });
 }
 
 function addWRow(i){
   const g=document.getElementById('g3');
-  const row=document.createElement('div'); row.className='w-row';
-  row.innerHTML=`<div class="w-num">${i}-savol</div>
+  const card=document.createElement('div'); card.className='w-card';
+  card.innerHTML=`<div class="w-qnum">${i}-savol</div>
     <div class="w-parts">
-      <div class="w-part"><div class="w-plbl">a)</div><textarea class="w-inp" id="w-${i}-a" rows="2" placeholder="a javob..."></textarea><div class="w-hint" id="wh-${i}-a"></div></div>
-      <div class="w-part"><div class="w-plbl">b)</div><textarea class="w-inp" id="w-${i}-b" rows="2" placeholder="b javob..."></textarea><div class="w-hint" id="wh-${i}-b"></div></div>
+      <div class="w-part"><div class="w-plbl">a)</div><textarea class="w-ta" id="w-${i}-a" rows="2" placeholder="a javob..."></textarea><div class="w-hint" id="wh-${i}-a"></div></div>
+      <div class="w-part"><div class="w-plbl">b)</div><textarea class="w-ta" id="w-${i}-b" rows="2" placeholder="b javob..."></textarea><div class="w-hint" id="wh-${i}-b"></div></div>
     </div>`;
-  g.appendChild(row);
+  g.appendChild(card);
   ['a','b'].forEach(p=>{
-    const ta=row.querySelector(`#w-${i}-${p}`);
+    const ta=card.querySelector(`#w-${i}-${p}`);
     ta.addEventListener('input',()=>{userAnswers[`${i}-${p}`]=ta.value.trim();updateProg();});
   });
 }
@@ -845,128 +1186,89 @@ function updateProg(){
   let f=0;
   for(let i=1;i<=35;i++) if(userAnswers[i]) f++;
   for(let i=36;i<=45;i++) if(userAnswers[`${i}-a`]||userAnswers[`${i}-b`]) f++;
-  document.getElementById('pFill').style.width=(f/45*100)+'%';
+  const pct=f/45*100;
+  document.getElementById('pFill').style.width=pct+'%';
+  document.getElementById('tProg').style.width=pct+'%';
   document.getElementById('pLbl').textContent=`${f} / 45 to'ldirilgan`;
   document.getElementById('filled').textContent=f;
 }
 
-// ──────────────────────────────────────────
-// RASCH MODEL — to'g'ri versiya
-// ──────────────────────────────────────────
-// P(x=1|theta,b) = 1 / (1 + exp(-(theta-b)))
-function raschP(theta,b){ return 1/(1+Math.exp(-(theta-b))); }
+// ════════════════════════════════════════
+//  RASCH — Newton-Raphson MLE (to'g'ri)
+// ════════════════════════════════════════
+function raschP(theta,b){return 1/(1+Math.exp(-(theta-b)));}
 
-// Newton-Raphson MLE theta estimation
-// responseVec: array of 0/1 (aligned with bVals)
-function estimateTheta(responseVec, bVals){
-  const n = responseVec.length;
-  const sumR = responseVec.reduce((a,b)=>a+b,0);
-
-  // Edge cases: perfect score or zero score
-  if(sumR===n) return 3.0;
-  if(sumR===0) return -3.0;
-
-  let theta = 0;
-  for(let iter=0;iter<100;iter++){
-    let grad=0, hess=0;
+function estimateTheta(resp,bVals){
+  const n=resp.length;
+  const s=resp.reduce((a,x)=>a+x,0);
+  if(s===n) return 3.0;
+  if(s===0) return -3.0;
+  let theta=0;
+  for(let it=0;it<150;it++){
+    let g=0,h=0;
     for(let j=0;j<n;j++){
-      const p = raschP(theta, bVals[j]);
-      grad += responseVec[j] - p;          // first derivative
-      hess -= p*(1-p);                     // second derivative (negative)
+      const p=raschP(theta,bVals[j]);
+      g+=resp[j]-p;
+      h-=p*(1-p);
     }
-    if(Math.abs(hess)<1e-9) break;
-    const delta = -grad/hess;              // Newton step
-    theta += delta;
-    theta = Math.max(-4, Math.min(4, theta));
-    if(Math.abs(delta)<0.0001) break;
+    if(Math.abs(h)<1e-10) break;
+    const delta=-g/h;
+    theta=Math.max(-4,Math.min(4,theta+delta));
+    if(Math.abs(delta)<0.00001) break;
   }
   return Math.round(theta*100)/100;
 }
 
 function thetaDesc(t){
-  if(t>=2)   return 'Juda yuqori qobiliyat — top 5%';
+  if(t>=2.5) return 'Fenomenal daraja — top 1%';
+  if(t>=2)   return 'Juda yuqori — top 5%';
   if(t>=1)   return 'Yuqori qobiliyat darajasi';
   if(t>=0.5) return "O'rtadan ancha yuqori";
   if(t>=0)   return "O'rtacha daraja";
   if(t>=-0.5)return "O'rtadan biroz past";
   if(t>=-1)  return "O'rtacha past daraja";
-  if(t>=-2)  return "Qoniqarli, mashq kerak";
-  return       "Past daraja — ko'proq tayyorlanish kerak";
+  if(t>=-2)  return 'Qoniqarli, mashq tavsiya etiladi';
+  return       'Past daraja — intensiv tayyorlanish kerak';
 }
 
-function getBand(score){
-  for(const b of BANDS) if(score>=b.min) return b;
-  return BANDS[BANDS.length-1];
-}
+function getBand(s){for(const b of BANDS)if(s>=b.min)return b;return BANDS[BANDS.length-1];}
 
-// ──────────────────────────────────────────
-// SUBMIT & SCORE
-// ──────────────────────────────────────────
+// ════════════════════════════════════════
+//  SUBMIT
+// ════════════════════════════════════════
 async function submitTest(){
-  const ans = adminConfig.answers;
-  const diff = adminConfig.diff;
+  const ans=cfg.answers, diff=cfg.diff;
+  let correct=0,wrong=0,empty=0,raw=0,c1=0,c2=0,c3=0;
+  const resp=[],bv=[];
 
-  let correct=0, wrong=0, empty=0;
-  let raw=0, c1=0, c2=0, c3=0;
-  const respVec=[], bVec=[];
-
-  // 1-32: 1 ball each
-  for(let i=1;i<=32;i++){
-    const u=userAnswers[i]||'';
-    const c=ans[i]||'';
+  function evalMC(i,ball){
+    const u=userAnswers[i]||'', c=ans[i]||'';
     const b=diff[i]!==undefined?Number(diff[i]):0;
     const or=document.getElementById(`opts-${i}`);
-    if(or) or.querySelectorAll('.ob').forEach(x=>x.className='ob');
-
+    if(or) or.querySelectorAll('.ob').forEach(x=>{x.className='ob';x.setAttribute('data-opt',x.textContent);});
     let r=0;
-    if(!c){ if(u){correct++;raw+=1;c1++;r=1;} else empty++; }
+    if(!c){if(u){correct++;raw+=ball;r=1;if(ball===1)c1++;else c2++;}else empty++;}
     else if(!u){
       empty++;
       const m=document.getElementById(`ub-${i}-${c}`);
-      if(m)m.classList.add('missed');
+      if(m){m.className='ob missed';m.setAttribute('data-opt',c);}
     } else if(u===c){
-      correct++;raw+=1;c1++;r=1;
+      correct++;raw+=ball;r=1;if(ball===1)c1++;else c2++;
       const m=document.getElementById(`ub-${i}-${u}`);
-      if(m)m.classList.add('correct');
+      if(m){m.className='ob correct';m.setAttribute('data-opt',u);}
     } else {
       wrong++;
       const w=document.getElementById(`ub-${i}-${u}`);
-      if(w)w.classList.add('wrong');
+      if(w){w.className='ob wrong';w.setAttribute('data-opt',u);}
       const m=document.getElementById(`ub-${i}-${c}`);
-      if(m)m.classList.add('missed');
+      if(m){m.className='ob missed';m.setAttribute('data-opt',c);}
     }
-    respVec.push(r); bVec.push(b);
+    resp.push(r); bv.push(b);
   }
 
-  // 33-35: 2 ball each
-  for(let i=33;i<=35;i++){
-    const u=userAnswers[i]||'';
-    const c=ans[i]||'';
-    const b=diff[i]!==undefined?Number(diff[i]):0;
-    const or=document.getElementById(`opts-${i}`);
-    if(or) or.querySelectorAll('.ob').forEach(x=>x.className='ob');
+  for(let i=1;i<=32;i++) evalMC(i,1);
+  for(let i=33;i<=35;i++) evalMC(i,2);
 
-    let r=0;
-    if(!c){ if(u){correct++;raw+=2;c2++;r=1;} else empty++; }
-    else if(!u){
-      empty++;
-      const m=document.getElementById(`ub-${i}-${c}`);
-      if(m)m.classList.add('missed');
-    } else if(u===c){
-      correct++;raw+=2;c2++;r=1;
-      const m=document.getElementById(`ub-${i}-${u}`);
-      if(m)m.classList.add('correct');
-    } else {
-      wrong++;
-      const w=document.getElementById(`ub-${i}-${u}`);
-      if(w)w.classList.add('wrong');
-      const m=document.getElementById(`ub-${i}-${c}`);
-      if(m)m.classList.add('missed');
-    }
-    respVec.push(r); bVec.push(b);
-  }
-
-  // 36-45: 0.7 per sub-part (key word matching)
   for(let i=36;i<=45;i++){
     ['a','b'].forEach(p=>{
       const u=(userAnswers[`${i}-${p}`]||'').toLowerCase().trim();
@@ -975,389 +1277,532 @@ async function submitTest(){
       const h=document.getElementById(`wh-${i}-${p}`);
       if(!ta) return;
       ta.readOnly=true;
-      if(!c){ if(u){correct++;raw+=0.7;c3++;} else empty++; }
+      if(!c){if(u){correct++;raw+=0.7;c3++;}else empty++;}
       else if(!u){
-        empty++;
-        ta.classList.add('wi');
-        h.textContent='✅ To\'g\'ri: '+ans[`${i}-${p}`];
-        h.style.display='block';
+        empty++;ta.classList.add('wi');
+        h.textContent='✅ To\'g\'ri: '+ans[`${i}-${p}`];h.style.display='block';
       } else if(u.includes(c)||c.includes(u)){
-        correct++;raw+=0.7;c3++;
-        ta.classList.add('ci');
+        correct++;raw+=0.7;c3++;ta.classList.add('ci');
       } else {
-        wrong++;
-        ta.classList.add('wi');
-        h.textContent='✅ To\'g\'ri: '+ans[`${i}-${p}`];
-        h.style.display='block';
+        wrong++;ta.classList.add('wi');
+        h.textContent='✅ To\'g\'ri: '+ans[`${i}-${p}`];h.style.display='block';
       }
     });
   }
 
-  // Scale to 100
-  const scaled = Math.round((raw/RAW_MAX)*100);
-
-  // Rasch theta
-  const theta = estimateTheta(respVec, bVec);
-
-  // Grade
-  const band = getBand(scaled);
-
-  // Section percentages
+  const scaled=Math.round((raw/RAW_MAX)*100);
+  const theta=estimateTheta(resp,bv);
+  const band=getBand(scaled);
   const p1=Math.round((c1/32)*100);
   const p2=c2>0?Math.round((c2/3)*100):0;
   const p3=Math.round((c3/20)*100);
 
-  // Build result object
-  const code = document.getElementById('testTitle').textContent.replace('📝 ','');
-  const resultObj = {
-    id: Date.now(),
-    userId: userProfile.userId||'anon',
-    userName: userProfile.name||'Ishtirokchi',
-    code, date: new Date().toLocaleDateString('uz-UZ'),
-    scaled, raw:Math.round(raw*10)/10,
-    theta, grade:band.grade,
-    correct, wrong, empty,
-    c1, c2, c3, p1, p2, p3,
-    band
+  // Coin reward by grade
+  let coinReward=0;
+  if(band.grade==='A+') coinReward=30;
+  else if(band.grade==='A') coinReward=20;
+  else if(band.grade==='B+'||band.grade==='B') coinReward=10;
+  else if(scaled>=46) coinReward=5;
+
+  if(coinReward>0){
+    profile.coins=(profile.coins||0)+coinReward;
+    await sSet(PROF_KEY,profile,false);
+    updateCoinUI();
+  }
+
+  const resObj={
+    id:Date.now(),
+    userId:profile.userId,
+    userName:profile.name,
+    code:activeTestCode,
+    date:new Date().toLocaleDateString('uz-UZ'),
+    scaled,raw:Math.round(raw*10)/10,
+    theta,grade:band.grade,
+    correct,wrong,empty,
+    p1,p2,p3,coinReward
   };
-  currentResult = resultObj;
+  currentResult=resObj;
+  profile.attempts=(profile.attempts||0)+1;
+  await sSet(PROF_KEY,profile,false);
 
-  // Save to shared results
-  allResults.unshift(resultObj);
-  if(allResults.length>500) allResults=allResults.slice(0,500);
-  await storageSet(RESULTS_KEY, allResults, true);
-
-  // Update user profile
-  userProfile.attempts = (userProfile.attempts||0)+1;
-  await storageSet(PROFILE_KEY, userProfile, false);
+  results.unshift(resObj);
+  if(results.length>1000) results=results.slice(0,1000);
+  await sSet(RES_KEY,results,true);
 
   // Fill result screen
-  fillResultScreen(resultObj, band);
-  showScreen('resultDetailScreen');
-
+  fillResult(resObj,band,coinReward);
+  push('resultScreen');
   if(tg) tg.sendData(JSON.stringify({scaled,theta,grade:band.grade,correct,wrong,empty}));
 }
 
-function fillResultScreen(r, band){
-  const gc=document.getElementById('rGradeRing');
-  gc.textContent=band.grade;
-  gc.style.color=band.color;
-  gc.style.borderColor=band.color;
-  gc.style.boxShadow=`0 0 24px ${band.color}44`;
-  gc.style.setProperty('--c',band.color);
+function fillResult(r,band,coinReward){
+  const ring=document.getElementById('rRing');
+  ring.textContent=band.grade;
+  ring.style.color=band.color;
+  ring.style.borderColor=band.color;
+  ring.style.boxShadow=`0 0 30px ${band.color}44`;
+  document.getElementById('rGlow').style.borderColor=band.color;
   document.getElementById('rGradeName').textContent=band.lbl;
+  document.getElementById('rGradeName').style.color=band.color;
 
+  const ts=r.theta>=0?'+':'';
   document.getElementById('rScore').textContent=r.scaled;
-  document.getElementById('rScoreSub').textContent=`ball · xom: ${r.raw}/${RAW_MAX} · Rasch bilan hisoblangan`;
-
-  const tSign = r.theta>=0?'+':'';
-  document.getElementById('rTheta').textContent=`θ = ${tSign}${r.theta}`;
+  document.getElementById('rScore').style.color=band.color;
+  document.getElementById('rScoreSub').textContent=`ball · xom: ${r.raw}/${RAW_MAX}`;
+  document.getElementById('rTheta').textContent=`θ = ${ts}${r.theta}`;
   document.getElementById('rThetaDesc').textContent=thetaDesc(r.theta);
-
   document.getElementById('rC').textContent=r.correct;
   document.getElementById('rW').textContent=r.wrong;
   document.getElementById('rE').textContent=r.empty;
+  ['1','2','3'].forEach(n=>{
+    document.getElementById(`bk${n}`).style.width=r[`p${n}`]+'%';
+    document.getElementById(`bk${n}p`).textContent=r[`p${n}`]+'%';
+  });
 
-  document.getElementById('bk1').style.width=r.p1+'%';
-  document.getElementById('bk1p').textContent=r.p1+'%';
-  document.getElementById('bk2').style.width=r.p2+'%';
-  document.getElementById('bk2p').textContent=r.p2+'%';
-  document.getElementById('bk3').style.width=r.p3+'%';
-  document.getElementById('bk3p').textContent=r.p3+'%';
-
-  const cc=document.getElementById('rCertCard');
+  const cc=document.getElementById('rCert');
   cc.style.background=band.bg;
   cc.style.border=`1px solid ${band.color}44`;
-  document.getElementById('rCertIcon').textContent=band.icon;
-  document.getElementById('rCertTitle').style.color=band.color;
-  document.getElementById('rCertTitle').textContent=band.cert;
-  document.getElementById('rCertSub').textContent=
-    `${band.grade} · ${r.scaled} ball · ${r.scaled>=46?'Sertifikat talablari bajarildi ✓':'Minimal ball (46) ga yetmadi'}`;
+  cc.innerHTML=`<div class="cert-icon">${band.icon}</div>
+    <div><div class="cert-title" style="color:${band.color}">${band.cert}</div>
+    <div class="cert-sub">${band.grade} daraja · ${r.scaled>=46?'Sertifikat talablari bajarildi ✓':'Minimal 46 ballga yetmadi'}</div></div>`;
+
+  const cr=document.getElementById('rCoinReward');
+  if(coinReward>0){
+    cr.style.display='flex';
+    document.getElementById('crTitle').textContent=`+${coinReward} 🪙 moneta yutdingiz!`;
+    document.getElementById('crSub').textContent=band.grade+' daraja uchun bonus mukofot';
+  } else cr.style.display='none';
 }
 
-function showAnswerDetail(){
-  // Just scroll to top — answers already highlighted in testScreen
-  fromDetail=true;
-  showScreen('testScreen');
-  document.getElementById('testScreen').scrollTop=0;
-}
-
-function backFromResult(){
-  if(fromDetail){ showScreen('resultDetailScreen'); fromDetail=false; return; }
-  showScreen('appScreen');
-  renderDashboard();
-  renderHistory();
+function showAnswers(){
+  // scroll testScreen to top
+  document.getElementById('testBody').scrollTop=0;
+  push('testScreen');
 }
 
 function retryTest(){
-  for(let i=36;i<=45;i++){
-    ['a','b'].forEach(p=>{
-      const ta=document.getElementById(`w-${i}-${p}`);
-      const h=document.getElementById(`wh-${i}-${p}`);
-      if(ta){ta.readOnly=false;ta.value='';ta.className='w-inp';}
-      if(h){h.style.display='none';h.textContent='';}
-    });
-  }
-  buildTestUI();
-  showScreen('testScreen');
-  document.getElementById('testScreen').scrollTop=0;
+  for(let i=36;i<=45;i++)['a','b'].forEach(p=>{
+    const ta=document.getElementById(`w-${i}-${p}`);
+    const h=document.getElementById(`wh-${i}-${p}`);
+    if(ta){ta.readOnly=false;ta.value='';ta.className='w-ta';}
+    if(h){h.style.display='none';h.textContent='';}
+  });
+  buildTest();
+  // go back to test
+  const idx=navStack.indexOf('resultScreen');
+  if(idx>-1) navStack.splice(idx,1);
+  push('testScreen');
+  document.getElementById('testBody').scrollTop=0;
 }
 
-// ──────────────────────────────────────────
-// DASHBOARD
-// ──────────────────────────────────────────
-function renderDashboard(){
-  // Date
-  document.getElementById('dashDate').textContent = new Date().toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+// ════════════════════════════════════════
+//  DASHBOARD
+// ════════════════════════════════════════
+function renderDash(){
+  document.getElementById('dashDate').textContent=
+    new Date().toLocaleDateString('uz-UZ',{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('heroName').innerHTML=
+    `<span>${(profile.name||'Foydalanuvchi').split(' ')[0]}</span>`;
 
-  // Hero name
-  document.getElementById('heroName').textContent = userProfile.name||'Ishtirokchi';
-  document.getElementById('dashBadge').textContent = '🎓 SertTest';
+  const my=results.filter(r=>r.userId===profile.userId);
+  const best=my.length?Math.max(...my.map(r=>r.scaled)):0;
+  const avg=my.length?Math.round(my.reduce((a,r)=>a+r.scaled,0)/my.length):0;
+  const bestBand=my.length?getBand(best):null;
 
-  // My results only
-  const myR = allResults.filter(r=>r.userId===userProfile.userId);
-  const totalAttempts = myR.length;
-  const bestScore = myR.length?Math.max(...myR.map(r=>r.scaled)):0;
-  const avgScore  = myR.length?Math.round(myR.reduce((a,r)=>a+r.scaled,0)/myR.length):0;
-  const bestBand  = myR.length?getBand(bestScore):null;
-
-  // Stats grid
-  const sg=document.getElementById('dashStats'); sg.innerHTML='';
-  const stats=[
-    {ic:'🎯',val:totalAttempts,lbl:"Jami urinishlar"},
-    {ic:'⭐',val:bestScore?bestScore+'%':'—',lbl:'Eng yuqori ball'},
-    {ic:'📈',val:avgScore?avgScore+'%':'—',lbl:'O\'rtacha ball'},
-    {ic:'🏅',val:bestBand?bestBand.grade:'—',lbl:'Eng yaxshi daraja',color:bestBand?.color},
-  ];
-  stats.forEach(s=>{
-    const c=document.createElement('div'); c.className='stat-card';
-    c.innerHTML=`<div class="ic">${s.ic}</div>
-      <div class="val" style="${s.color?'color:'+s.color:''}">${s.val}</div>
-      <div class="lbl">${s.lbl}</div>`;
-    sg.appendChild(c);
+  const kpi=document.getElementById('kpiRow'); kpi.innerHTML='';
+  [
+    {ic:'🎯',val:my.length,lbl:"Urinishlar",cls:'k1'},
+    {ic:'⭐',val:best?best+'%':'—',lbl:'Eng yuqori',cls:'k2',color:bestBand?.color},
+    {ic:'📈',val:avg?avg+'%':'—',lbl:"O'rtacha",cls:'k3'},
+    {ic:'🏅',val:bestBand?bestBand.grade:'—',lbl:'Daraja',cls:'k4',color:bestBand?.color},
+  ].forEach(s=>{
+    const c=document.createElement('div');
+    c.className=`kpi ${s.cls}`;
+    c.innerHTML=`<div class="kpi-ic">${s.ic}</div>
+      <div class="kpi-val" ${s.color?`style="color:${s.color}"`:''}>${s.val}</div>
+      <div class="kpi-lbl">${s.lbl}</div>`;
+    kpi.appendChild(c);
   });
 
-  // Active test
-  const atw=document.getElementById('activTestWrap');
-  if(adminConfig.testCode){
-    atw.style.display='block';
-    document.getElementById('atcCode').textContent=adminConfig.testCode;
-  } else { atw.style.display='none'; }
-
-  // Best band
-  const bbw=document.getElementById('bestBandWrap');
-  if(bestBand&&myR.length){
-    bbw.style.display='block';
-    const bb=document.getElementById('bestBand');
-    bb.style.background=bestBand.bg;
-    bb.style.border=`1px solid ${bestBand.color}44`;
-    bb.innerHTML=`<div class="cs-icon">${bestBand.icon}</div>
-      <div class="cs-info">
-        <div class="cs-title" style="color:${bestBand.color}">${bestBand.cert}</div>
-        <div class="cs-sub">${bestBand.grade} daraja · ${bestScore} ball</div>
+  // Active test banner
+  const bw=document.getElementById('testBannerWrap'); bw.innerHTML='';
+  if(cfg.testCode){
+    const price=cfg.testPrice||0;
+    const bought=(profile.boughtTests||[]).includes(cfg.testCode.toUpperCase());
+    bw.innerHTML=`
+      <div class="sec-lbl">Faol test</div>
+      <div class="test-banner" onclick="goActiveTest()">
+        <div class="tb-tag"><div class="tb-dot"></div> Hozir mavjud</div>
+        <div class="tb-code">${cfg.testCode}</div>
+        <div class="tb-meta">45 savol · Rasch modeli · Milliy sertifikat</div>
+        ${price>0&&!bought?`<div class="tb-price">🪙 ${price}</div>`:''}
+        ${price>0&&!bought?'':`<div class="tb-price" style="background:#22d37a15;border-color:#22d37a33;color:#22d37a">✓ Ochiq</div>`}
+        <div class="tb-cta">▶ Boshlash →</div>
       </div>`;
-  } else bbw.style.display='none';
+  }
 
-  // Recent results
-  const rw=document.getElementById('recentWrap');
-  const rl=document.getElementById('recentList');
-  rl.innerHTML='';
-  if(myR.length){
-    rw.style.display='block';
-    myR.slice(0,5).forEach(r=>{
-      const band=getBand(r.scaled);
-      const item=document.createElement('div'); item.className='result-item';
+  // Recent
+  const rs=document.getElementById('recentSec');
+  const rl=document.getElementById('recentList'); rl.innerHTML='';
+  if(my.length){
+    rs.style.display='flex';
+    my.slice(0,4).forEach(r=>{
+      const b=getBand(r.scaled);
+      const item=document.createElement('div'); item.className='rc';
       item.innerHTML=`
-        <div class="ri-grade" style="color:${band.color};border-color:${band.color};background:${band.bg}">${band.grade}</div>
-        <div class="ri-info">
-          <div class="ri-code">📝 ${r.code}</div>
-          <div class="ri-meta">${r.date} · ${r.correct}✅ ${r.wrong}❌ ${r.empty}⬜</div>
+        <div class="rc-grade" style="color:${b.color};border-color:${b.color};background:${b.bg}">${b.grade}</div>
+        <div class="rc-info">
+          <div class="rc-code">📝 ${r.code}</div>
+          <div class="rc-meta">${r.date} · ${r.correct}✅ ${r.wrong}❌ · θ=${r.theta>=0?'+':''}${r.theta}</div>
         </div>
-        <div class="ri-score" style="color:${band.color}">${r.scaled}</div>`;
+        <div class="rc-score" style="color:${b.color}">${r.scaled}</div>`;
       item.onclick=()=>viewResult(r);
       rl.appendChild(item);
     });
-  } else rw.style.display='none';
+  } else rs.style.display='none';
 }
 
-// ──────────────────────────────────────────
-// TESTS PAGE
-// ──────────────────────────────────────────
-function renderTests(){
-  const wrap=document.getElementById('testsWrap'); wrap.innerHTML='';
-  if(!adminConfig.testCode){
-    wrap.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-lbl">Hozircha faol test yo'q</div></div>`;
+// ════════════════════════════════════════
+//  LEADERBOARD — Rasch theta asosida
+// ════════════════════════════════════════
+function renderLeader(){
+  const wrap=document.getElementById('leaderWrap'); wrap.innerHTML='';
+
+  // Best result per user (by scaled score, then theta)
+  const byUser={};
+  results.forEach(r=>{
+    if(!byUser[r.userId]||r.scaled>byUser[r.userId].scaled||
+       (r.scaled===byUser[r.userId].scaled&&r.theta>byUser[r.userId].theta)){
+      byUser[r.userId]=r;
+    }
+  });
+
+  const sorted=Object.values(byUser)
+    .sort((a,b)=>b.theta-a.theta||b.scaled-a.scaled);
+
+  if(!sorted.length){
+    wrap.innerHTML=`<div class="empty-st"><div class="empty-ic">🏆</div><div>Hali natijalar yo'q</div></div>`;
     return;
   }
 
-  // My attempts on this test
-  const myR=allResults.filter(r=>r.userId===userProfile.userId&&r.code===adminConfig.testCode);
-
-  const card=document.createElement('div'); card.className='test-card';
-  card.innerHTML=`
-    <div class="tc-head">
-      <div class="tc-code">📝 ${adminConfig.testCode}</div>
-      <div class="tc-status st-active">Faol</div>
-    </div>
-    <div class="tc-meta">45 savol · ABCD + ABCDEF + Yozma · ${myR.length} marta urinilgan</div>
-    <div class="tc-progress" style="margin-top:10px">
-      <div style="font-size:11px;color:var(--muted);margin-bottom:5px">
-        ${myR.length?`Eng yuqori: ${Math.max(...myR.map(r=>r.scaled))} ball`:'Hali urinilmagan'}
+  // Podium (top 3)
+  const top3=sorted.slice(0,3);
+  const order=[1,0,2]; // second, first, third
+  const podDiv=document.createElement('div'); podDiv.className='leader-podium';
+  order.forEach(idx=>{
+    if(!top3[idx]) return;
+    const r=top3[idx];
+    const b=getBand(r.scaled);
+    const cls=idx===0?'first':idx===1?'second':'third';
+    const ranks=['🥇','🥈','🥉'];
+    const sizes=[60,50,44];
+    const heights=[90,70,55];
+    const p=document.createElement('div'); p.className=`pod ${cls}`;
+    p.style.marginBottom=idx===0?'0':`${heights[0]-heights[idx]}px`;
+    p.innerHTML=`
+      <div class="pod-rank">${ranks[idx]}</div>
+      <div class="pod-avatar" style="width:${sizes[idx]}px;height:${sizes[idx]}px;border-color:${b.color};background:${b.bg}">
+        ${r.userName.charAt(0).toUpperCase()}
       </div>
-      <button class="sub-btn" style="padding:10px;font-size:13px" onclick="openTest('${adminConfig.testCode}')">▶ Boshlash</button>
-    </div>`;
-  wrap.appendChild(card);
+      <div class="pod-name">${r.userName.split(' ')[0]}</div>
+      <div class="pod-score" style="color:${b.color}">${r.scaled}%</div>`;
+    podDiv.appendChild(p);
+  });
+  wrap.appendChild(podDiv);
 
-  // Past attempts on this test
-  if(myR.length){
-    const h=document.createElement('div');
-    h.innerHTML='<div class="section-title" style="margin-top:16px;padding:0">Mening urinishlarim</div>';
-    wrap.appendChild(h);
-    myR.slice(0,5).forEach(r=>{
-      const band=getBand(r.scaled);
-      const it=document.createElement('div'); it.className='result-item';
-      it.style.marginTop='8px';
-      it.innerHTML=`
-        <div class="ri-grade" style="color:${band.color};border-color:${band.color};background:${band.bg}">${band.grade}</div>
-        <div class="ri-info">
-          <div class="ri-code">${r.date}</div>
-          <div class="ri-meta">${r.correct}✅ ${r.wrong}❌ ${r.empty}⬜ · θ=${r.theta}</div>
-        </div>
-        <div class="ri-score" style="color:${band.color}">${r.scaled}</div>`;
-      it.onclick=()=>viewResult(r);
-      wrap.appendChild(it);
-    });
-  }
-}
-
-// ──────────────────────────────────────────
-// HISTORY
-// ──────────────────────────────────────────
-function renderHistory(){
-  const wrap=document.getElementById('histWrap'); wrap.innerHTML='';
-  const myR=allResults.filter(r=>r.userId===userProfile.userId);
-  if(!myR.length){
-    wrap.innerHTML=`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-lbl">Hali natijalar yo'q<br>Birinchi testni boshlang!</div></div>`;
-    return;
-  }
-  myR.forEach(r=>{
-    const band=getBand(r.scaled);
-    const it=document.createElement('div'); it.className='hist-item';
-    it.innerHTML=`
-      <div class="hi-grade" style="color:${band.color};border-color:${band.color};background:${band.bg}">${band.grade}</div>
-      <div class="hi-info">
-        <div class="hi-code">📝 ${r.code}</div>
-        <div class="hi-date">${r.date}</div>
-        <div class="hi-details">${r.correct}✅ ${r.wrong}❌ ${r.empty}⬜ · θ=${r.theta>=0?'+':''}${r.theta}</div>
-      </div>
+  // List (4+)
+  const list=document.createElement('div'); list.className='leader-list';
+  sorted.forEach((r,i)=>{
+    const b=getBand(r.scaled);
+    const isMe=r.userId===profile.userId;
+    const item=document.createElement('div');
+    item.className='ll-item'+(isMe?' is-me':'');
+    const ts=r.theta>=0?'+':'';
+    item.innerHTML=`
+      <div class="ll-rank">${i+1}</div>
       <div>
-        <div class="hi-score" style="color:${band.color}">${r.scaled}</div>
-        <div style="font-size:11px;color:var(--muted);text-align:right">ball</div>
-      </div>`;
+        <div class="ll-name">${r.userName}${isMe?' 👈':''}</div>
+        <div class="ll-theta">θ=${ts}${r.theta}</div>
+      </div>
+      <div class="ll-grade" style="background:${b.bg};color:${b.color}">${b.grade}</div>
+      <div class="ll-score" style="color:${b.color}">${r.scaled}</div>`;
+    item.onclick=()=>viewResult(r);
+    list.appendChild(item);
+  });
+  wrap.appendChild(list);
+}
+
+// ════════════════════════════════════════
+//  HISTORY
+// ════════════════════════════════════════
+function renderHistory(){
+  const wrap=document.getElementById('histList'); wrap.innerHTML='';
+  const my=results.filter(r=>r.userId===profile.userId);
+  if(!my.length){
+    wrap.innerHTML=`<div class="empty-st"><div class="empty-ic">📊</div><div>Hali natijalar yo'q</div></div>`;
+    return;
+  }
+  my.forEach(r=>{
+    const b=getBand(r.scaled);
+    const it=document.createElement('div'); it.className='rc';
+    it.innerHTML=`
+      <div class="rc-grade" style="color:${b.color};border-color:${b.color};background:${b.bg}">${b.grade}</div>
+      <div class="rc-info">
+        <div class="rc-code">📝 ${r.code}</div>
+        <div class="rc-meta">${r.date} · ${r.correct}✅ ${r.wrong}❌ ${r.empty}⬜</div>
+        <div class="rc-meta" style="margin-top:2px">θ = ${r.theta>=0?'+':''}${r.theta} · ${thetaDesc(r.theta).split('—')[0]}</div>
+      </div>
+      <div class="rc-score" style="color:${b.color}">${r.scaled}</div>`;
     it.onclick=()=>viewResult(r);
     wrap.appendChild(it);
   });
 }
 
 function viewResult(r){
-  const band=r.band||getBand(r.scaled);
-  fillResultScreen(r, band);
-  showScreen('resultDetailScreen');
+  currentResult=r;
+  fillResult(r,getBand(r.scaled),0);
+  push('resultScreen');
 }
 
-// ──────────────────────────────────────────
-// PROFILE
-// ──────────────────────────────────────────
+// ════════════════════════════════════════
+//  COIN SHOP
+// ════════════════════════════════════════
+function renderShop(){
+  updateCoinUI();
+  const grid=document.getElementById('shopGrid'); grid.innerHTML='';
+  COIN_PACKAGES.forEach(pkg=>{
+    const c=document.createElement('div'); c.className='shop-card';
+    c.innerHTML=`
+      <div class="sc-icon">${pkg.ic}</div>
+      <div class="sc-name">${pkg.name}</div>
+      <div class="sc-price">🪙 ${pkg.coins}</div>
+      <div class="sc-desc">${pkg.desc}</div>
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-top:2px">${pkg.price}</div>`;
+    c.onclick=()=>buyPackage(pkg);
+    grid.appendChild(c);
+  });
+
+  const tw=document.getElementById('testShopWrap'); tw.innerHTML='';
+  if(cfg.testCode&&cfg.testPrice>0){
+    const bought=(profile.boughtTests||[]).includes(cfg.testCode.toUpperCase());
+    tw.innerHTML=`
+      <div class="test-banner" style="cursor:${bought?'default':'pointer'}" onclick="${bought?'':` initiateTest('${cfg.testCode}')`}">
+        <div class="tb-tag"><div class="tb-dot"></div> ${cfg.testCode}</div>
+        <div class="tb-code">${cfg.testCode}</div>
+        <div class="tb-meta">45 savol · Milliy sertifikat tizimi</div>
+        ${bought
+          ?'<div style="margin-top:10px;color:var(--green);font-weight:700;font-size:13px">✓ Sotib olingan</div>'
+          :`<div class="tb-price">🪙 ${cfg.testPrice}</div><div class="tb-cta">🪙 Sotib olish →</div>`}
+      </div>`;
+  }
+}
+
+async function buyPackage(pkg){
+  if(pkg.free){
+    profile.coins=(profile.coins||0)+pkg.coins;
+    await sSet(PROF_KEY,profile,false);
+    updateCoinUI();
+    showToast(`🎉 ${pkg.coins} 🪙 qo'shildi!`);
+    return;
+  }
+  // In real app: payment gateway here
+  showToast(`💳 To'lov tizimi tez orada qo'shiladi!`);
+}
+
+function updateCoinUI(){
+  const c=profile.coins||0;
+  document.getElementById('coinAmt').textContent=c;
+  document.getElementById('shopCoin').textContent=c;
+  document.getElementById('shopBal').textContent=c;
+}
+
+// ════════════════════════════════════════
+//  PROFILE
+// ════════════════════════════════════════
 function renderProfile(){
   const wrap=document.getElementById('profWrap'); wrap.innerHTML='';
-  const myR=allResults.filter(r=>r.userId===userProfile.userId);
-  const best=myR.length?Math.max(...myR.map(r=>r.scaled)):0;
-  const avg=myR.length?Math.round(myR.reduce((a,r)=>a+r.scaled,0)/myR.length):0;
-  const bestBand=myR.length?getBand(best):null;
+  const my=results.filter(r=>r.userId===profile.userId);
+  const best=my.length?Math.max(...my.map(r=>r.scaled)):0;
+  const avg=my.length?Math.round(my.reduce((a,r)=>a+r.scaled,0)/my.length):0;
+  const bestBand=my.length?getBand(best):null;
 
-  // Hero
   const h=document.createElement('div'); h.className='prof-hero';
   h.innerHTML=`
-    <div class="ph-avatar">👤</div>
-    <div class="ph-name">${userProfile.name||'Ishtirokchi'}</div>
-    <div class="ph-sub">SertTest foydalanuvchisi</div>
+    <div class="ph-av">👤</div>
+    <div class="ph-name">${profile.name||'Foydalanuvchi'}</div>
+    <div class="ph-sub">SertTest Pro foydalanuvchisi</div>
     <div class="ph-chips">
-      <div class="ph-chip">${myR.length} urinish</div>
+      <div class="ph-chip">${my.length} urinish</div>
+      <div class="ph-chip" style="color:var(--coin)">🪙 ${profile.coins||0}</div>
       ${bestBand?`<div class="ph-chip" style="color:${bestBand.color}">${bestBand.grade} eng yaxshi</div>`:''}
     </div>`;
   wrap.appendChild(h);
 
-  // Stats
-  const sg=document.createElement('div'); sg.className='prof-stats';
-  [{val:myR.length,lbl:'Urinishlar'},{val:best?best+'%':'—',lbl:'Eng yuqori'},{val:avg?avg+'%':'—',lbl:"O'rtacha"}].forEach(s=>{
-    const c=document.createElement('div'); c.className='ps-card';
-    c.innerHTML=`<div class="ps-val">${s.val}</div><div class="ps-lbl">${s.lbl}</div>`;
+  const sg=document.createElement('div'); sg.className='prof-sgrid';
+  [{v:my.length,l:'Urinishlar'},{v:best?best+'%':'—',l:'Eng yuqori'},{v:avg?avg+'%':'—',l:"O'rtacha"}].forEach(s=>{
+    const c=document.createElement('div'); c.className='psg';
+    c.innerHTML=`<div class="psg-v">${s.v}</div><div class="psg-l">${s.l}</div>`;
     sg.appendChild(c);
   });
   wrap.appendChild(sg);
 
-  // Score history chart
-  if(myR.length>1){
-    const gh=document.createElement('div'); gh.className='grade-history';
-    const recent=myR.slice(0,8).reverse();
-    const mx=Math.max(...recent.map(r=>r.scaled))||100;
-    gh.innerHTML=`<div class="gh-title">So'nggi natijalar dinamikasi</div>
-      <div class="gh-bars">${recent.map(r=>{
-        const band=getBand(r.scaled);
-        const h=Math.round((r.scaled/mx)*70)+10;
-        return `<div class="gh-bar-wrap">
-          <div class="gh-bar" style="background:${band.color};height:${h}px"></div>
-          <div class="gh-lbl">${r.scaled}</div>
-        </div>`;
+  // Score trend chart
+  if(my.length>1){
+    const rec=my.slice(0,8).reverse();
+    const mx=Math.max(...rec.map(r=>r.scaled))||100;
+    const ch=document.createElement('div'); ch.className='bar-chart';
+    ch.innerHTML=`<div class="bc-ttl">Ball dinamikasi</div>
+      <div class="bc-bars">${rec.map(r=>{
+        const b=getBand(r.scaled);
+        const h=Math.round((r.scaled/mx)*60)+8;
+        return `<div class="bc-bw"><div class="bc-b" style="background:${b.color};height:${h}px"></div><div class="bc-l">${r.scaled}</div></div>`;
       }).join('')}</div>`;
-    wrap.appendChild(gh);
+    wrap.appendChild(ch);
   }
 
-  // Grades breakdown
-  const grades=['A+','A','B+','B','C+','C','F'];
-  const counts={};
-  grades.forEach(g=>counts[g]=myR.filter(r=>r.grade===g).length);
-  const gb=document.createElement('div'); gb.className='grade-history';
-  gb.innerHTML=`<div class="gh-title">Darajalar bo'yicha taqsimot</div>
-    ${grades.filter(g=>counts[g]>0).map(g=>{
-      const band=getBand(BANDS.find(b=>b.grade===g)?.min||0);
-      return `<div class="bk-row" style="margin-bottom:6px">
-        <div class="bk-lbl" style="color:${band.color};font-weight:700">${g}</div>
-        <div class="bk-bw"><div class="bk-bf" style="background:${band.color};width:${Math.round(counts[g]/myR.length*100)}%"></div></div>
-        <div class="bk-pct" style="color:${band.color}">${counts[g]}x</div>
-      </div>`;
-    }).join('')}`;
-  wrap.appendChild(gb);
+  // Leaderboard rank
+  const byUser={};
+  results.forEach(r=>{
+    if(!byUser[r.userId]||r.scaled>byUser[r.userId].scaled||(r.scaled===byUser[r.userId].scaled&&r.theta>byUser[r.userId].theta)){byUser[r.userId]=r;}
+  });
+  const sorted=Object.values(byUser).sort((a,b)=>b.theta-a.theta||b.scaled-a.scaled);
+  const rank=sorted.findIndex(r=>r.userId===profile.userId)+1;
+  if(rank>0){
+    const rb=document.createElement('div');
+    rb.style.cssText='background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;';
+    rb.innerHTML=`<div style="font-size:32px">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'🏅'}</div>
+      <div><div style="font-size:14px;font-weight:800">Reytingdagi o'rningiz</div>
+      <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--acc)">#${rank}</div>
+      <div style="font-size:11px;color:var(--muted)">${sorted.length} ishtirokchi orasida</div></div>`;
+    wrap.appendChild(rb);
+  }
 
-  // Recent
-  if(myR.length){
+  // Recent results
+  if(my.length){
     const rt=document.createElement('div');
-    rt.innerHTML='<div class="section-title" style="padding:0;margin-bottom:10px">So\'nggi urinishlar</div>';
+    rt.innerHTML='<div class="bc-ttl" style="padding:0;margin-bottom:10px">So\'nggi natijalar</div>';
     wrap.appendChild(rt);
-    myR.slice(0,5).forEach(r=>{
-      const band=getBand(r.scaled);
-      const it=document.createElement('div'); it.className='hist-item'; it.style.marginBottom='8px';
+    my.slice(0,5).forEach(r=>{
+      const b=getBand(r.scaled);
+      const it=document.createElement('div'); it.className='rc'; it.style.marginBottom='8px';
       it.innerHTML=`
-        <div class="hi-grade" style="color:${band.color};border-color:${band.color};background:${band.bg}">${band.grade}</div>
-        <div class="hi-info">
-          <div class="hi-code">📝 ${r.code}</div>
-          <div class="hi-date">${r.date}</div>
-        </div>
-        <div class="hi-score" style="color:${band.color}">${r.scaled}</div>`;
+        <div class="rc-grade" style="color:${b.color};border-color:${b.color};background:${b.bg}">${b.grade}</div>
+        <div class="rc-info"><div class="rc-code">📝 ${r.code}</div><div class="rc-meta">${r.date}</div></div>
+        <div class="rc-score" style="color:${b.color}">${r.scaled}</div>`;
       it.onclick=()=>viewResult(r);
       wrap.appendChild(it);
     });
   }
 }
 
-// ──────────────────────────────────────────
-// UTILS
-// ──────────────────────────────────────────
-function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
-
-// Keyboard helpers
+// ════════════════════════════════════════
+//  ADMIN
+// ════════════════════════════════════════
+function checkAdmin(){
+  if(document.getElementById('adminPass').value!==ADMIN_PASSWORD){
+    showE('adminErr','❌ Noto\'g\'ri parol!');return;
+  }
+  document.getElementById('adminErr').style.display='none';
+  document.getElementById('adminPass').value='';
+  buildAdmin();
+  push('adminScreen');
+}
 document.getElementById('adminPass').addEventListener('keydown',e=>{if(e.key==='Enter')checkAdmin();});
+
+function buildAdmin(){
+  document.getElementById('aCode').value=cfg.testCode||'';
+  document.getElementById('aPrice').value=cfg.testPrice||0;
+  document.getElementById('curCode').textContent=cfg.testCode||'—';
+  document.getElementById('curPrice').textContent=cfg.testPrice||0;
+  document.getElementById('adminSubLbl').textContent=`Kod: ${cfg.testCode||'—'} · Narx: ${cfg.testPrice||0}🪙`;
+
+  // Diff grid
+  const dg=document.getElementById('diffGrid'); dg.innerHTML='';
+  for(let i=1;i<=35;i++){
+    const c=document.createElement('div'); c.className='dc';
+    c.innerHTML=`<div class="dc-n">${i}</div>
+      <input class="dc-v" id="dv-${i}" type="number" step="0.1" min="-3" max="3" value="${cfg.diff[i]!==undefined?cfg.diff[i]:0}"/>`;
+    dg.appendChild(c);
+  }
+
+  buildAG('ag1',1,32,['A','B','C','D']);
+  buildAG('ag2',33,35,['A','B','C','D','E','F']);
+  buildAW();
+}
+
+function buildAG(id,from,to,opts){
+  const g=document.getElementById(id); g.innerHTML='';
+  for(let i=from;i<=to;i++){
+    const row=document.createElement('div'); row.className='a-qrow';
+    row.innerHTML=`<div class="a-qnum">${i}</div><div class="a-opts" id="ao-${i}"></div>`;
+    g.appendChild(row);
+    const or=row.querySelector('.a-opts');
+    opts.forEach(o=>{
+      const b=document.createElement('button');
+      b.className='a-ob'+(cfg.answers[i]===o?` sel-${o}`:'');
+      b.textContent=o;
+      b.onclick=()=>{or.querySelectorAll('.a-ob').forEach(x=>x.className='a-ob');b.classList.add(`sel-${o}`);cfg.answers[i]=o;};
+      or.appendChild(b);
+    });
+  }
+}
+
+function buildAW(){
+  const g=document.getElementById('agW'); g.innerHTML='';
+  for(let i=36;i<=45;i++){
+    const d=document.createElement('div'); d.className='wk-card';
+    d.innerHTML=`<div class="wk-l">${i}-savol kalit so'zlari</div>
+      <div class="wk-row">
+        <div class="wk-p"><div class="wk-l">a)</div><textarea class="wk-ta" id="wk-${i}-a" rows="2">${cfg.answers[`${i}-a`]||''}</textarea></div>
+        <div class="wk-p"><div class="wk-l">b)</div><textarea class="wk-ta" id="wk-${i}-b" rows="2">${cfg.answers[`${i}-b`]||''}</textarea></div>
+      </div>`;
+    g.appendChild(d);
+  }
+}
+
+async function adminSaveCode(){
+  cfg.testCode=document.getElementById('aCode').value.trim().toUpperCase();
+  cfg.testPrice=parseInt(document.getElementById('aPrice').value)||0;
+  await sSet(CFG_KEY,cfg,true);
+  document.getElementById('curCode').textContent=cfg.testCode||'—';
+  document.getElementById('curPrice').textContent=cfg.testPrice;
+  document.getElementById('adminSubLbl').textContent=`Kod: ${cfg.testCode||'—'} · Narx: ${cfg.testPrice}🪙`;
+  showToast('✅ Kod va narx saqlandi!');
+}
+
+async function adminSaveAll(){
+  cfg.testCode=document.getElementById('aCode').value.trim().toUpperCase();
+  cfg.testPrice=parseInt(document.getElementById('aPrice').value)||0;
+  for(let i=1;i<=35;i++){
+    const el=document.getElementById(`dv-${i}`);
+    if(el) cfg.diff[i]=parseFloat(el.value)||0;
+  }
+  for(let i=36;i<=45;i++){
+    ['a','b'].forEach(p=>{
+      const el=document.getElementById(`wk-${i}-${p}`);
+      if(el) cfg.answers[`${i}-${p}`]=el.value.trim();
+    });
+  }
+  await sSet(CFG_KEY,cfg,true);
+  document.getElementById('curCode').textContent=cfg.testCode||'—';
+  document.getElementById('curPrice').textContent=cfg.testPrice;
+  document.getElementById('adminSubLbl').textContent=`Kod: ${cfg.testCode||'—'} · Narx: ${cfg.testPrice}🪙`;
+  showToast('✅ Barcha sozlamalar saqlandi!');
+}
+
+// ════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════
+function showE(id,msg){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';}
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Close modal on overlay click
+document.getElementById('payModal').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
+});
 </script>
 </body>
 </html>
